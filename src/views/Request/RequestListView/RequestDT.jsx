@@ -88,7 +88,7 @@ const RequestBecaDT = () => {
 
    const handleClickAdd = () => {
       try {
-         location = "/admin/solicitud-beca";
+         location.hash = "/admin/solicitud-beca";
       } catch (error) {
          console.log(error);
          Toast.Error(error);

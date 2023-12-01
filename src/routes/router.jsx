@@ -1,4 +1,4 @@
-import { createBrowserRouter, useRoutes } from "react-router-dom";
+import { createHashRouter, useRoutes } from "react-router-dom";
 
 // routes
 import MainRoutes from "./MainRoutes";
@@ -19,7 +19,7 @@ const AuthLogin = Loadable(lazy(() => import("../views/authentication/Login")));
 const AuthRegister = Loadable(lazy(() => import("../views/authentication/Register")));
 // ====================|| AUTHENTICATION ROUTING ||===================== //
 
-export const router = createBrowserRouter([
+export const router = createHashRouter([
    {
       path: "/",
       element: <MinimalLayout />,
