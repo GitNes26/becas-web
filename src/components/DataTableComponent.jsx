@@ -10,7 +10,7 @@ import { InputText } from "primereact/inputtext";
 import { InputNumber } from "primereact/inputnumber";
 import { Dropdown } from "primereact/dropdown";
 import { Tag } from "primereact/tag";
-import { Button, ButtonGroup, Card, Tooltip } from "@mui/material";
+import { Button, ButtonGroup, Card, IconButton, Tooltip } from "@mui/material";
 import { IconEdit, IconFile, IconFileSpreadsheet, IconSearch } from "@tabler/icons";
 import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
 import { FilterMatchMode, FilterOperator } from "primereact/api";
@@ -204,28 +204,33 @@ export default function DataTableComponent({
    const header = (
       <Box sx={{ display: "flex", gap: 2, justifyContent: "space-between", alignItems: "center" }}>
          <Tooltip title="Exportar a Excel" placement="top">
-            <Button type="button" variant="text" color="success" sx={{ borderRadius: "12px", mr: 1 }} onClick={exportExcel}>
+            <IconButton type="button" variant="text" color="success" sx={{ borderRadius: "12px", mr: 1 }} onClick={exportExcel}>
                <IconFileSpreadsheet />
-            </Button>
+            </IconButton>
          </Tooltip>
 
          <Tooltip title="Exportar a PDF" placement="top">
-            <Button type="button" variant="text" color="error" sx={{ borderRadius: "12px", mr: 1 }} onClick={exportPdf}>
+            <IconButton type="button" variant="text" color="error" sx={{ borderRadius: "12px", mr: 1 }} onClick={exportPdf}>
                <PictureAsPdfIcon />
-            </Button>
+            </IconButton>
          </Tooltip>
          <Tooltip title="Refrescar Tabla" placement="top">
-            <Button type="button" variant="text" sx={{ borderRadius: "12px", mr: 1 }} onClick={handleClickRefresh}>
+            <IconButton type="button" variant="text" color="primary" sx={{ borderRadius: "12px", mr: 1 }} onClick={handleClickRefresh}>
                <i className="pi pi-refresh"></i>
-            </Button>
+            </IconButton>
          </Tooltip>
          <span className="p-input-icon-left">
             <i className="pi pi-search" />
             <InputText value={globalFilterValue} type="search" onChange={onGlobalFilterChange} placeholder="Buscador General" />
          </span>
          {btnAdd && (
-            <Button variant="contained" fullWidth onClick={() => (rowEdit ? addRow() : handleClickAdd())}>
-               <AddCircleOutlineOutlined sx={{ mr: 0.2 }} />
+            <Button
+               variant="contained"
+               sx={{ width: 250 }}
+               startIcon={<AddCircleOutlineOutlined sx={{ mr: 0.2 }} />}
+               size="large"
+               onClick={() => (rowEdit ? addRow() : handleClickAdd())}
+            >
                AGREGAR
             </Button>
          )}

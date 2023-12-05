@@ -9,7 +9,7 @@ import SchoolContextProvider from "../context/SchoolContext";
 import LevelContextProvider from "../context/LevelContext";
 import PerimetersView from "../views/admin/PerimetersView/Index";
 import PerimeterContextProvider from "../context/PerimeterContext";
-import RequestBecaView from "../views/admin/RequestBecaView";
+import RequestBecaView from "../views/admin/RequestBecaView/RequestBecaView";
 import DisabilitiesView from "../views/admin/DisabilitiesView/Index";
 import DisabilityContextProvider from "../context/DisabilityContext";
 import RequestBecaContextProvider from "../context/RequestBecaContext";
@@ -48,7 +48,7 @@ const MainRoutes = {
       //    element: <DashboardDefault />
       // },
       {
-         path: "solicitud-beca/:folio?",
+         path: "solicitud-beca/pagina?/:pagina?/folio?:folio?",
          element: (
             <RequestBecaContextProvider>
                <StudentContextProvider>
