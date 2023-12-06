@@ -264,7 +264,7 @@ const InputsCommunityComponent = ({ formData, setFormData, values, setFieldValue
                   error={errors.zip && touched.zip}
                   helperText={errors.zip && touched.zip && errors.zip}
                />
-               {showLoading && <CircularProgress disableShrink sx={{ position: "absolute", left: "35%", mt: 0.75, zIndex: 10 }} />}
+               {showLoading && <CircularProgress disableShrink sx={{ position: "relative", right: "-65%", top: "-52px", mt: 0.75, zIndex: 10 }} />}
             </Grid>
             {/* Estado */}
             <Grid xs={12} md={columnsByTextField} sx={{ mb: 2 }}>

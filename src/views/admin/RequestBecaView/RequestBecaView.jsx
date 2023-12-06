@@ -262,7 +262,7 @@ const RequestBecaView = () => {
          if (axiosReponse.result == null)
             return sAlert.Info("El CURP ingresado no está registrado, veritifíca que este correcto para guardarse al finalizar esta solicitud.");
 
-         console.log("CURP - axiosReponse.result", axiosReponse.result);
+         // console.log("CURP - axiosReponse.result", axiosReponse.result);
          await setFieldValue("tutor_data_id", axiosReponse.result.id);
          await setFieldValue("tutor_relationship_id", axiosReponse.result.tutor_relationship_id);
          await setFieldValue("tutor_relationship", axiosReponse.result.relationship);
@@ -347,7 +347,7 @@ const RequestBecaView = () => {
          }
          // console.log("values", values);
          await setFormData({ ...formData, ...values });
-         // console.log("formData", formData);
+         console.log("formData-1", formData);
          // await setValues(formData);
          // console.log("formData", formData);
          // console.log("values", values);
@@ -373,7 +373,7 @@ const RequestBecaView = () => {
 
          console.log("values", values);
          await setFormData({ ...formData, ...values });
-         console.log("formData", formData);
+         console.log("formData-2", formData);
          // await setValues(values);
          // console.log("formData", formData);
          // console.log("values", values);
@@ -396,15 +396,15 @@ const RequestBecaView = () => {
          // console.log("formData en submit3", formData);
          console.log("values", values);
          await setFormData({ ...formData, ...values });
-         console.log("formData", formData);
+         // console.log("formData", formData);
          // await setValues(formData);
-         console.log("formData", formData);
+         console.log("formData-3", formData);
          console.log("values", values);
          // console.log(formData);
          setLoadingAction(true);
          let axiosResponse;
-         if (values.id == 0) axiosResponse = await createRequestBeca(formData);
-         else axiosResponse = await updateRequestBeca(formData);
+         if (values.id == 0) axiosResponse = await createRequestBeca(values);
+         else axiosResponse = await updateRequestBeca(values);
          setSubmitting(false);
          setLoadingAction(false);
 
@@ -413,7 +413,9 @@ const RequestBecaView = () => {
          console.log("axiosResponse", axiosResponse);
          folio = axiosResponse.result.folio;
          sAlert.Success(
-            `Tu solicitud ha sido creada, termina de llenar el formulario para que se considere tu solicitud. Tu folio es: <h3>${folio}</h3> <p>Puedes ver tus solicitudes guardadas y su estatus en la sección de "Mis Solicitudes" en tu menú lateral</p>`,
+            `Tu solicitud ha sido creada, termina de llenar el formulario para que se considere tu solicitud. Tu folio es: 
+            <h3>${folio}</h3> 
+            <i>Puedes ver tus solicitudes guardadas y su estatus en la sección de "Mis Solicitudes" en tú menú lateral</i>`,
             null
          );
          setStepFailed(-1);

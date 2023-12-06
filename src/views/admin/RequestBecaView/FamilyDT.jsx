@@ -31,6 +31,7 @@ const RequestBecaDT = () => {
       singularName,
       requestBeca,
       requestBecas,
+      setRequestBecas,
       getRequestBecas,
       showRequestBeca,
       deleteRequestBeca,
@@ -121,9 +122,9 @@ const RequestBecaDT = () => {
    const data = [];
    const formatData = async () => {
       try {
-         // console.log("cargar listado", requestBecas);
+         console.log("cargar listado", requestBecas);
          await requestBecas.map((obj) => {
-            // console.log(obj);
+            console.log(obj);
             let register = obj;
             register.actions = <ButtonsAction id={obj.id} name={obj.requestBeca} active={obj.active} />;
             data.push(register);
@@ -138,6 +139,34 @@ const RequestBecaDT = () => {
    };
    formatData();
 
+   const addRow = () => {
+      console.log("addRow - data", data);
+      const newRow = {
+         id: data.length + 1,
+         code: "",
+         name: "",
+         description: "",
+         image: "",
+         price: "",
+         category: "",
+         quantity: "",
+         inventoryStatus: "",
+         rating: ""
+      };
+
+      // let _products = [...data];
+      // console.log("_products", _products);
+      // // let { newData, index } = e;
+
+      // // _products[index] = newData;
+      // _products.push(newRow);
+
+      // setData(_products);
+
+      // // setData(newRow);
+      // console.log(data);
+   };
+
    useEffect(() => {
       setLoading(false);
    }, []);
@@ -145,12 +174,15 @@ const RequestBecaDT = () => {
       <DataTableComponent
          columns={columns}
          data={data}
-         setData={setData}
+         setData={setRequestBecas}
          globalFilterFields={globalFilterFields}
          headerFilters={false}
          handleClickAdd={handleClickAdd}
          rowEdit={true}
+         btnAdd={true}
+         addRow={addRow}
          refreshTable={getRequestBecas}
+         btnsExport={false}
       />
    );
 };

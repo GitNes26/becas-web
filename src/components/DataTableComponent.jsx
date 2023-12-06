@@ -33,7 +33,9 @@ export default function DataTableComponent({
    rowEdit = false,
    handleClickAdd,
    refreshTable,
-   btnAdd = true
+   btnAdd = true,
+   addRow,
+   btnsExport = true
 }) {
    const { setLoadingAction, setOpenDialog } = useGlobalContext();
 
@@ -64,33 +66,33 @@ export default function DataTableComponent({
       }
    };
 
-   const addRow = () => {
-      console.log(data);
-      const newProducts = {
-         // id: cont++,
-         code: "",
-         name: "",
-         description: "",
-         image: "",
-         price: "",
-         category: "",
-         quantity: "",
-         inventoryStatus: "",
-         rating: ""
-      };
+   // const addRow = () => {
+   //    console.log(data);
+   //    const newProducts = {
+   //       // id: cont++,
+   //       code: "",
+   //       name: "",
+   //       description: "",
+   //       image: "",
+   //       price: "",
+   //       category: "",
+   //       quantity: "",
+   //       inventoryStatus: "",
+   //       rating: ""
+   //    };
 
-      let _products = [...data];
-      console.log("_products", _products);
-      // let { newData, index } = e;
+   //    let _products = [...data];
+   //    console.log("_products", _products);
+   //    // let { newData, index } = e;
 
-      // _products[index] = newData;
-      _products.push(newProducts);
+   //    // _products[index] = newData;
+   //    _products.push(newProducts);
 
-      setData(_products);
+   //    setData(_products);
 
-      // setData(newProducts);
-      console.log(data);
-   };
+   //    // setData(newProducts);
+   //    console.log(data);
+   // };
 
    const onRowEditComplete = (e) => {
       console.log(e);
@@ -203,17 +205,22 @@ export default function DataTableComponent({
 
    const header = (
       <Box sx={{ display: "flex", gap: 2, justifyContent: "space-between", alignItems: "center" }}>
-         <Tooltip title="Exportar a Excel" placement="top">
-            <IconButton type="button" variant="text" color="success" sx={{ borderRadius: "12px", mr: 1 }} onClick={exportExcel}>
-               <IconFileSpreadsheet />
-            </IconButton>
-         </Tooltip>
+         {btnsExport && (
+            <>
+               <Tooltip title="Exportar a Excel" placement="top">
+                  <IconButton type="button" variant="text" color="success" sx={{ borderRadius: "12px", mr: 1 }} onClick={exportExcel}>
+                     <IconFileSpreadsheet />
+                  </IconButton>
+               </Tooltip>
 
-         <Tooltip title="Exportar a PDF" placement="top">
-            <IconButton type="button" variant="text" color="error" sx={{ borderRadius: "12px", mr: 1 }} onClick={exportPdf}>
-               <PictureAsPdfIcon />
-            </IconButton>
-         </Tooltip>
+               <Tooltip title="Exportar a PDF" placement="top">
+                  <IconButton type="button" variant="text" color="error" sx={{ borderRadius: "12px", mr: 1 }} onClick={exportPdf}>
+                     <PictureAsPdfIcon />
+                  </IconButton>
+               </Tooltip>
+            </>
+         )}
+
          <Tooltip title="Refrescar Tabla" placement="top">
             <IconButton type="button" variant="text" color="primary" sx={{ borderRadius: "12px", mr: 1 }} onClick={handleClickRefresh}>
                <i className="pi pi-refresh"></i>
