@@ -11,7 +11,7 @@ import { Button, ButtonGroup, IconButton, Tooltip, Typography } from "@mui/mater
 import IconEdit from "../../../components/icons/IconEdit";
 import IconDelete from "../../../components/icons/IconDelete";
 
-import { useRequestBecaContext } from "../../../context/RequestBecaContext";
+import { useFamilyContext } from "../../../context/FamilyContext";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
 import sAlert, { QuestionAlertConfig } from "../../../utils/sAlert";
@@ -23,36 +23,27 @@ import { IconCircleXFilled } from "@tabler/icons-react";
 import { formatCurrency, formatDatetime } from "../../../utils/Formats";
 import { useAuthContext } from "../../../context/AuthContext";
 import SwitchComponent from "../../../components/SwitchComponent";
+import { useParams } from "react-router-dom";
 
-const RequestBecaDT = () => {
+const FamilyDT = () => {
+   let { folio, pagina = 0 } = useParams();
+
    const { auth } = useAuthContext();
    const { setLoading, setLoadingAction, setOpenDialog } = useGlobalContext();
-   const {
-      singularName,
-      requestBeca,
-      requestBecas,
-      setRequestBecas,
-      getRequestBecas,
-      showRequestBeca,
-      deleteRequestBeca,
-      DisEnableRequestBeca,
-      resetFormData,
-      resetRequestBeca,
-      setTextBtnSumbit,
-      setFormTitle
-   } = useRequestBecaContext();
-   const globalFilterFields = ["requestBeca", "active", "created_at"];
+   const { singularName, family, families, setFamilies, getIndexByFolio, deleteFamily, DisEnableFamily, resetFormData, resetFamily, setTextBtnSumbit, setFormTitle } =
+      useFamilyContext();
+   const globalFilterFields = ["relationship", "age", "occupation", "monthly_income", "active", "created_at"];
 
    // #region BodysTemplate
    const RelationshipBodyTemplate = (obj) => <Typography textAlign={"center"}>{obj.relationship.toUpperCase()}</Typography>;
    const AgeBodyTemplate = (obj) => <Typography textAlign={"center"}>{obj.age}</Typography>;
    const OccupationBodyTemplate = (obj) => <Typography textAlign={"center"}>{obj.occupation}</Typography>;
-   const MonthlyIcomeBodyTemplate = (obj) => <Typography textAlign={"center"}>{obj.monthly_income}</Typography>;
+   const MonthlyIcomeBodyTemplate = (obj) => <Typography textAlign={"center"}>{formatCurrency(obj.monthly_income, true, true)}</Typography>;
    // #endregion BodysTemplate
 
    const columns = [
       { field: "relationship", header: "Parentesco", sortable: true, functionEdit: null, body: RelationshipBodyTemplate, filterField: null },
-      { field: "age", header: "Edad", sortable: true, functionEdit: null, body: AgeBodyTemplate, filterField: null },
+      { field: "age", header: "Edad (años)", sortable: true, functionEdit: null, body: AgeBodyTemplate, filterField: null },
       { field: "occupation", header: "Ocupación", sortable: true, functionEdit: null, body: OccupationBodyTemplate, filterField: null },
       { field: "monthly_income", header: "Ingresos Mensuales", sortable: true, functionEdit: null, body: MonthlyIcomeBodyTemplate, filterField: null }
    ];
@@ -61,7 +52,7 @@ const RequestBecaDT = () => {
 
    const handleClickAdd = () => {
       try {
-         // resetRequestBeca();
+         // resetFamily();
          resetFormData();
          setOpenDialog(true);
          setTextBtnSumbit("AGREGAR");
@@ -77,7 +68,7 @@ const RequestBecaDT = () => {
          setLoadingAction(true);
          setTextBtnSumbit("GUARDAR");
          setFormTitle(`EDITAR ${singularName.toUpperCase()}`);
-         await showRequestBeca(id);
+         await showFamily(id);
          setOpenDialog(true);
          setLoadingAction(false);
       } catch (error) {
@@ -91,7 +82,7 @@ const RequestBecaDT = () => {
          mySwal.fire(QuestionAlertConfig(`Estas seguro de eliminar a ${name}`)).then(async (result) => {
             if (result.isConfirmed) {
                setLoadingAction(true);
-               const axiosResponse = await deleteRequestBeca(id);
+               const axiosResponse = await deleteFamily(id);
                setLoadingAction(false);
                Toast.Customizable(axiosResponse.alert_text, axiosResponse.alert_icon);
             }
@@ -122,14 +113,14 @@ const RequestBecaDT = () => {
    const data = [];
    const formatData = async () => {
       try {
-         console.log("cargar listado", requestBecas);
-         await requestBecas.map((obj) => {
+         console.log("cargar listado", families);
+         await families.map((obj) => {
             console.log(obj);
             let register = obj;
-            register.actions = <ButtonsAction id={obj.id} name={obj.requestBeca} active={obj.active} />;
+            register.actions = <ButtonsAction id={obj.id} name={obj.family} active={obj.active} />;
             data.push(register);
          });
-         // if (data.length > 0) setGlobalFilterFields(Object.keys(requestBecas[0]));
+         // if (data.length > 0) setGlobalFilterFields(Object.keys(families[0]));
          // console.log("la data del formatData", globalFilterFields);
          setLoading(false);
       } catch (error) {
@@ -143,47 +134,46 @@ const RequestBecaDT = () => {
       console.log("addRow - data", data);
       const newRow = {
          id: data.length + 1,
-         code: "",
-         name: "",
-         description: "",
-         image: "",
-         price: "",
-         category: "",
-         quantity: "",
-         inventoryStatus: "",
-         rating: ""
+         beca_id: 1,
+         relationship: "",
+         age: 0,
+         occupation: "",
+         monthly_income: 0
+         // finished: false
       };
 
-      // let _products = [...data];
-      // console.log("_products", _products);
-      // // let { newData, index } = e;
+      let _data = [...data];
+      console.log("_data", _data);
+      // let { newData, index } = e;
 
-      // // _products[index] = newData;
-      // _products.push(newRow);
+      // _data[index] = newData;
+      _data.push(newRow);
 
-      // setData(_products);
+      setFamilies(_data);
 
-      // // setData(newRow);
-      // console.log(data);
+      // setData(newRow);
+      console.log(data);
    };
 
    useEffect(() => {
+      getIndexByFolio(folio);
       setLoading(false);
    }, []);
+
    return (
       <DataTableComponent
          columns={columns}
          data={data}
-         setData={setRequestBecas}
+         setData={setFamilies}
          globalFilterFields={globalFilterFields}
          headerFilters={false}
          handleClickAdd={handleClickAdd}
          rowEdit={true}
          btnAdd={true}
          addRow={addRow}
-         refreshTable={getRequestBecas}
+         refreshTable={getIndexByFolio(folio)}
          btnsExport={false}
       />
    );
 };
-export default RequestBecaDT;
+export default FamilyDT;

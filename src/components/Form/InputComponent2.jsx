@@ -1,4 +1,4 @@
-import { FormControl, FormHelperText } from "@mui/material";
+import { FormControl, FormHelperText, TextField } from "@mui/material";
 import { Field } from "formik";
 
 import Typography from "@mui/material/Typography";
@@ -7,6 +7,8 @@ import { InputAdornment, OutlinedInput } from "@mui/material";
 import { gpcDark, gpcLight } from "../../context/GlobalContext";
 import { styled } from "@mui/material/styles";
 import { shouldForwardProp } from "@mui/system";
+import { Input } from "@material-ui/core";
+import { wrap } from "framer-motion";
 
 const OutlineInputStyle = styled(OutlinedInput, { shouldForwardProp })(({ theme }) => ({
    // width: 434,
@@ -91,6 +93,60 @@ const InputComponentv2 = ({
                </>
             )}
          </Field>
+      </FormControl>
+   );
+};
+
+export const InputComponentv3 = ({
+   idName,
+   label,
+   type = "text",
+   value = "",
+   placeholder,
+   setFieldValue,
+   onChange,
+   onBlur,
+   error,
+   touched,
+   showErrorInput = null,
+   step = null,
+   disabled,
+   size = "small",
+   textAlign = "center",
+   ...prop
+}) => {
+   const errorInput = (step) => {
+      showErrorInput(step, error, true);
+   };
+
+   return (
+      <FormControl fullWidth sx={{ display: "flex", flexDirection: "row", alignItems: "flex-end" }}>
+         <TextField
+            id={idName}
+            name={idName}
+            type={type}
+            // fullWidth={fullWidth}
+            value={value}
+            variant="standard"
+            placeholder={placeholder || "Ingresa tu info"}
+            // inputProps={inputProps}
+            onChange={onChange}
+            onBlur={onBlur}
+            // disabled={values.id == 0 ? false : true}
+            // error={error && touched}
+            // helperText={error && touched && error}
+            sx={{ textAlign: "center" }}
+            {...prop}
+         />
+         {touched && error && (
+            <FormHelperText error id={`ht-${idName}`}>
+               {showErrorInput ? errorInput : error}
+               step=null
+            </FormHelperText>
+         )}
+         <Typography variant="body1" component="label" htmlFor={idName} ml={1}>
+            {label}
+         </Typography>
       </FormControl>
    );
 };

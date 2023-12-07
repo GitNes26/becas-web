@@ -4,9 +4,11 @@ import { Box, fontWeight } from "@mui/system";
 import {
    Button,
    ButtonGroup,
+   Checkbox,
    Divider,
    FormControl,
    FormControlLabel,
+   FormGroup,
    FormHelperText,
    FormLabel,
    IconButton,
@@ -47,9 +49,9 @@ import InputFileComponent from "../../../components/Form/InputFileComponent";
 import { useTutorContext } from "../../../context/TutorContext";
 import SimpleTableComponent from "../../../components/SimpleTableComponent";
 import { AddCircleOutlineOutlined } from "@mui/icons-material";
-import InputComponentv2 from "../../../components/Form/InputComponent2";
+import InputComponentv2, { InputComponentv3 } from "../../../components/Form/InputComponent2";
 import IconDelete from "../../../components/icons/IconDelete";
-import RequestBecaDT from "./FamilyDT";
+import FamilyDT from "./FamilyDT";
 
 const RequestBecaView = () => {
    // const { result } = useLoaderData();
@@ -424,6 +426,8 @@ const RequestBecaView = () => {
          // resetForm();
          // resetFormData();
          handleComplete();
+         location.hash = `/admin/solicitud-beca/pagina/${activeStep + 2}/folio/${folio}`;
+
          // if (!checkAdd) setOpenDialog(false);
       } catch (error) {
          console.error(error);
@@ -588,18 +592,25 @@ const RequestBecaView = () => {
    };
 
    useEffect(() => {
-      console.log("folio de params?", folio);
-      console.log("pagina de params?", pagina);
-      if (folio) showRequestBeca(folio);
-      getDisabilitiesSelectIndex();
-      getSchoolsSelectIndex();
-      getRelationshipsSelectIndex();
-      setLoading(false);
-      console.log(activeStep);
-      // window.location.hash = ;
-      // inputRefFullNameTutor.current.focus();
-      // console.log("useEffect - formData", formData);
-   }, [formData, pagina, activeStep]);
+      console.log("formData", formData);
+      if (formData.id < 1) {
+         console.log("folio de params?", folio);
+         console.log("pagina de params?", pagina);
+         if (folio) {
+            showRequestBeca(folio);
+            console.log("holaaaaa familia");
+            console.log("formData", formData);
+         }
+         getDisabilitiesSelectIndex();
+         getSchoolsSelectIndex();
+         getRelationshipsSelectIndex();
+         setLoading(false);
+         // window.location.hash = ;
+         // inputRefFullNameTutor.current.focus();
+         // console.log("useEffect - formData", formData);
+      }
+   }, [formData]);
+   // }, [formData, pagina, activeStep]);
 
    return (
       <Box sx={{ width: "100%", height: "100%" }}>
@@ -1125,7 +1136,7 @@ const RequestBecaView = () => {
                                              <Typography variant="h2" mb={2}>
                                                 ¿Quienes viven actualmente con el alumno?
                                              </Typography>
-                                             <RequestBecaDT />
+                                             <FamilyDT />
                                              {/* <SimpleTableComponent
                                                 title={"¿Quienes viven actualmente con el alumno?"}
                                                 columns={columns}
@@ -1149,7 +1160,7 @@ const RequestBecaView = () => {
                                           </Grid>
 
                                           {/* Parentesco */}
-                                          <Grid xs={12} md={4} sx={{ mb: 3 }}>
+                                          {/* <Grid xs={12} md={4} sx={{ mb: 3 }}>
                                              <TextField
                                                 id="relationship_id"
                                                 name="relationship_id"
@@ -1165,9 +1176,9 @@ const RequestBecaView = () => {
                                                 error={errors.relationship_id && touched.relationship_id}
                                                 helperText={errors.relationship_id && touched.relationship_id && showErrorInput(4, errors.relationship_id)}
                                              />
-                                          </Grid>
+                                          </Grid> */}
                                           {/* Edad */}
-                                          <Grid xs={12} md={2} sx={{ mb: 3 }}>
+                                          {/* <Grid xs={12} md={2} sx={{ mb: 3 }}>
                                              <TextField
                                                 id="age"
                                                 name="age"
@@ -1183,9 +1194,9 @@ const RequestBecaView = () => {
                                                 error={errors.age && touched.age}
                                                 helperText={errors.age && touched.age && showErrorInput(3, errors.age)}
                                              />
-                                          </Grid>
+                                          </Grid> */}
                                           {/* Ocupación */}
-                                          <Grid xs={12} md={4} sx={{ mb: 3 }}>
+                                          {/* <Grid xs={12} md={4} sx={{ mb: 3 }}>
                                              <TextField
                                                 id="occupation"
                                                 name="occupation"
@@ -1201,9 +1212,9 @@ const RequestBecaView = () => {
                                                 error={errors.occupation && touched.occupation}
                                                 helperText={errors.occupation && touched.occupation && showErrorInput(4, errors.occupation)}
                                              />
-                                          </Grid>
+                                          </Grid> */}
                                           {/* Ingreso Mensual */}
-                                          <Grid xs={12} md={2} sx={{ mb: 3 }}>
+                                          {/* <Grid xs={12} md={2} sx={{ mb: 3 }}>
                                              <TextField
                                                 id="monthly_income"
                                                 name="monthly_income"
@@ -1219,12 +1230,12 @@ const RequestBecaView = () => {
                                                 error={errors.monthly_income && touched.monthly_income}
                                                 helperText={errors.monthly_income && touched.monthly_income && showErrorInput(4, errors.monthly_income)}
                                              />
-                                          </Grid>
-                                          <Grid xs={12} sx={{ display: "flex", justifyContent: "flex-end" }}>
+                                          </Grid> */}
+                                          {/* <Grid xs={12} sx={{ display: "flex", justifyContent: "flex-end" }}>
                                              <Button variant="contained" color="success" onClick={() => handleClickAdd()} sx={{ mb: 1 }}>
                                                 <AddCircleOutlineOutlined sx={{ mr: 1 }}></AddCircleOutlineOutlined> AGREGAR
                                              </Button>
-                                          </Grid>
+                                          </Grid> */}
                                           {/* Ingresos Extra */}
                                           <Grid xs={12} md={6} sx={{ mb: 3 }}>
                                              <TextField
@@ -1255,7 +1266,7 @@ const RequestBecaView = () => {
                                                 onChange={handleChange}
                                                 onBlur={handleBlur}
                                                 fullWidth
-                                                inputProps={{ step: 0.01, min: 0, max: 100000 }}
+                                                inputProps={{ step: 0.01, min: 0, max: 100000, readOnly: true }}
                                                 disabled={values.id == 0 ? false : true}
                                                 error={errors.monthly_income && touched.monthly_income}
                                                 helperText={errors.monthly_income && touched.monthly_income && showErrorInput(4, errors.monthly_income)}
@@ -1581,9 +1592,9 @@ const RequestBecaView = () => {
                                        <Grid container spacing={2}>
                                           <Grid xs={12} md={12} sx={{ mb: 3 }}>
                                              <ol>
-                                                {/* La casa es */}
-                                                <FormControl fullWidth sx={{ mb: 5 }}>
-                                                   <FormLabel id="house_is-label">
+                                                {/* Equipamiento de la casa */}
+                                                <FormControl fullWidth sx={{ mb: 3 }}>
+                                                   <FormLabel id="household_equipment-label">
                                                       <Typography variant="h4" component={"p"} mb={1}>
                                                          <li>
                                                             Señala el número de los siguientes aparatos con que cuentas en casa (en caso de no tener, marca cero) 0 1 2
@@ -1591,216 +1602,474 @@ const RequestBecaView = () => {
                                                          </li>
                                                       </Typography>
                                                    </FormLabel>
-                                                   {touched.house_is && errors.house_is && (
-                                                      <FormHelperText error id="ht-house_is">
-                                                         {errors.house_is}
+                                                   {touched.household_equipment && errors.household_equipment && (
+                                                      <FormHelperText error id="ht-household_equipment">
+                                                         {errors.household_equipment}
                                                       </FormHelperText>
                                                    )}
-                                                   {/* Alimentación */}
-                                                   <Grid xs={12} md={12} sx={{ mb: 3 }}>
-                                                      <TextField
-                                                         id="food"
-                                                         name="food"
-                                                         label="Alimentación (despensa) *"
-                                                         type="number"
-                                                         value={values.food}
-                                                         placeholder="Ingrese el gasto mensual de alimentos"
-                                                         onChange={handleChange}
-                                                         onBlur={handleBlur}
-                                                         fullWidth
-                                                         inputProps={{ step: 0.01, min: 0, max: 100000 }}
-                                                         disabled={values.id == 0 ? false : true}
-                                                         error={errors.food && touched.food}
-                                                         helperText={errors.food && touched.food && showErrorInput(4, errors.food)}
-                                                      />
+                                                   <Grid container spacing={2}>
+                                                      <Grid xs={12} md={6} sx={{ mb: 1 }}>
+                                                         {/* Camas */}
+                                                         <Grid xs={12} md={6} sx={{ mb: 1 }}>
+                                                            <InputComponentv3
+                                                               idName="beds"
+                                                               label="Camas"
+                                                               type="number"
+                                                               value={values.beds}
+                                                               placeholder="0"
+                                                               setFieldValue={setFieldValue}
+                                                               onChange={handleChange}
+                                                               onBlur={handleBlur}
+                                                               inputProps={{ min: 0, max: 100000 }}
+                                                               disabled={values.id == 0 ? false : true}
+                                                               error={errors.beds}
+                                                               touched={touched.beds}
+                                                               showErrorInput={showErrorInput}
+                                                               step={4}
+                                                               size="normal"
+                                                               // error={errors.beds && touched.beds}
+                                                               // helperText={errors.beds && touched.beds && showErrorInput(4, errors.beds)}
+                                                            />
+                                                         </Grid>
+                                                         {/* Lavadoras */}
+                                                         <Grid xs={12} md={6} sx={{ mb: 1 }}>
+                                                            <InputComponentv3
+                                                               idName="washing_machines"
+                                                               label="Lavadoras"
+                                                               type="number"
+                                                               value={values.washing_machines}
+                                                               placeholder="0"
+                                                               setFieldValue={setFieldValue}
+                                                               onChange={handleChange}
+                                                               onBlur={handleBlur}
+                                                               inputProps={{ min: 0, max: 100000 }}
+                                                               disabled={values.id == 0 ? false : true}
+                                                               error={errors.washing_machines}
+                                                               touched={touched.washing_machines}
+                                                               showErrorInput={showErrorInput}
+                                                               step={4}
+                                                               size="normal"
+                                                            />
+                                                         </Grid>
+                                                         {/* Calentador de agua (boiler) */}
+                                                         <Grid xs={12} md={6} sx={{ mb: 1 }}>
+                                                            <InputComponentv3
+                                                               idName="boilers"
+                                                               label="Calentador de agua (boiler)"
+                                                               type="number"
+                                                               value={values.boilers}
+                                                               placeholder="0"
+                                                               setFieldValue={setFieldValue}
+                                                               onChange={handleChange}
+                                                               onBlur={handleBlur}
+                                                               inputProps={{ min: 0, max: 100000 }}
+                                                               disabled={values.id == 0 ? false : true}
+                                                               error={errors.boilers}
+                                                               touched={touched.boilers}
+                                                               showErrorInput={showErrorInput}
+                                                               step={4}
+                                                               size="normal"
+                                                            />
+                                                         </Grid>
+                                                         {/* Televisores */}
+                                                         <Grid xs={12} md={6} sx={{ mb: 1 }}>
+                                                            <InputComponentv3
+                                                               idName="tvs"
+                                                               label="Televisores"
+                                                               type="number"
+                                                               value={values.tvs}
+                                                               placeholder="0"
+                                                               setFieldValue={setFieldValue}
+                                                               onChange={handleChange}
+                                                               onBlur={handleBlur}
+                                                               inputProps={{ min: 0, max: 100000 }}
+                                                               disabled={values.id == 0 ? false : true}
+                                                               error={errors.tvs}
+                                                               touched={touched.tvs}
+                                                               showErrorInput={showErrorInput}
+                                                               step={4}
+                                                               size="normal"
+                                                            />
+                                                         </Grid>
+                                                         {/* Computadoras */}
+                                                         <Grid xs={12} md={6} sx={{ mb: 1 }}>
+                                                            <InputComponentv3
+                                                               idName="pcs"
+                                                               label="Computadoras"
+                                                               type="number"
+                                                               value={values.pcs}
+                                                               placeholder="0"
+                                                               setFieldValue={setFieldValue}
+                                                               onChange={handleChange}
+                                                               onBlur={handleBlur}
+                                                               inputProps={{ min: 0, max: 100000 }}
+                                                               disabled={values.id == 0 ? false : true}
+                                                               error={errors.pcs}
+                                                               touched={touched.pcs}
+                                                               showErrorInput={showErrorInput}
+                                                               step={4}
+                                                               size="normal"
+                                                            />
+                                                         </Grid>
+                                                      </Grid>
+                                                      <Grid xs={12} md={6} sx={{ mb: 1 }}>
+                                                         {/* Teléfonos (local o celular) */}
+                                                         <Grid xs={12} md={6} sx={{ mb: 1 }}>
+                                                            <InputComponentv3
+                                                               idName="phones"
+                                                               label="Teléfonos (local o celular)"
+                                                               type="number"
+                                                               value={values.phones}
+                                                               placeholder="0"
+                                                               setFieldValue={setFieldValue}
+                                                               onChange={handleChange}
+                                                               onBlur={handleBlur}
+                                                               inputProps={{ min: 0, max: 100000 }}
+                                                               disabled={values.id == 0 ? false : true}
+                                                               error={errors.phones}
+                                                               touched={touched.phones}
+                                                               showErrorInput={showErrorInput}
+                                                               step={4}
+                                                               size="normal"
+                                                            />
+                                                         </Grid>
+                                                         {/* Reproductores de Música */}
+                                                         <Grid xs={12} md={6} sx={{ mb: 1 }}>
+                                                            <InputComponentv3
+                                                               idName="music_player"
+                                                               label="Reproductores de Música"
+                                                               type="number"
+                                                               value={values.music_player}
+                                                               placeholder="0"
+                                                               setFieldValue={setFieldValue}
+                                                               onChange={handleChange}
+                                                               onBlur={handleBlur}
+                                                               inputProps={{ min: 0, max: 100000 }}
+                                                               disabled={values.id == 0 ? false : true}
+                                                               error={errors.music_player}
+                                                               touched={touched.music_player}
+                                                               showErrorInput={showErrorInput}
+                                                               step={4}
+                                                               size="normal"
+                                                            />
+                                                         </Grid>
+                                                         {/* Estufas */}
+                                                         <Grid xs={12} md={6} sx={{ mb: 1 }}>
+                                                            <InputComponentv3
+                                                               idName="stoves"
+                                                               label="Estufas"
+                                                               type="number"
+                                                               value={values.stoves}
+                                                               placeholder="0"
+                                                               setFieldValue={setFieldValue}
+                                                               onChange={handleChange}
+                                                               onBlur={handleBlur}
+                                                               inputProps={{ min: 0, max: 100000 }}
+                                                               disabled={values.id == 0 ? false : true}
+                                                               error={errors.stoves}
+                                                               touched={touched.stoves}
+                                                               showErrorInput={showErrorInput}
+                                                               step={4}
+                                                               size="normal"
+                                                            />
+                                                         </Grid>
+                                                         {/* Refrigeradores */}
+                                                         <Grid xs={12} md={6} sx={{ mb: 1 }}>
+                                                            <InputComponentv3
+                                                               idName="refrigerators"
+                                                               label="Refrigeradores"
+                                                               type="number"
+                                                               value={values.refrigerators}
+                                                               placeholder="0"
+                                                               setFieldValue={setFieldValue}
+                                                               onChange={handleChange}
+                                                               onBlur={handleBlur}
+                                                               inputProps={{ min: 0, max: 100000 }}
+                                                               disabled={values.id == 0 ? false : true}
+                                                               error={errors.refrigerators}
+                                                               touched={touched.refrigerators}
+                                                               showErrorInput={showErrorInput}
+                                                               step={4}
+                                                               size="normal"
+                                                            />
+                                                         </Grid>
+                                                      </Grid>
                                                    </Grid>
                                                 </FormControl>
-                                                {/* Material del techo */}
-                                                <FormControl fullWidth sx={{ mb: 5 }}>
-                                                   <FormLabel id="roof_material-label">
+
+                                                {/* Equipamiento de la casa */}
+                                                <FormControl fullWidth sx={{ mb: 3 }}>
+                                                   <FormLabel id="household_equipment-label">
                                                       <Typography variant="h4" component={"p"} mb={1}>
-                                                         <li>Material del techo de la vivienda (si está hecho de más de un matgerial, marca el que predomine):</li>
+                                                         <li>¿Cuáles son los servicios con que cuentas en tu casa?</li>
                                                       </Typography>
                                                    </FormLabel>
-                                                   {/* <ToggleButtonGroup color="primary" value={houseIs} exclusive onClick={handleHouseIs}>
-                                                <ToggleButton value="1@Lamina">Lamina (de cartón, de asbesto, madera)</ToggleButton>
-                                                <ToggleButton value="2@Concreto">Firme de concreto</ToggleButton>
-                                             </ToggleButtonGroup> */}
-                                                   <RadioGroup
-                                                      row
-                                                      aria-labelledby="roof_material-label"
-                                                      id="roof_material"
-                                                      name="roof_material"
-                                                      value={values.roof_material}
-                                                      onChange={handleChange}
-                                                      onBlur={handleBlur}
-                                                   >
-                                                      <FormControlLabel
-                                                         sx={{ mr: 5 }}
-                                                         value="1@Lamina"
-                                                         control={<Radio />}
-                                                         label="Lamina (de cartón, de asbesto, madera)"
-                                                      />
-                                                      <FormControlLabel sx={{ mr: 5 }} value="2@Concreto" control={<Radio />} label="Firme de concreto" />
-                                                   </RadioGroup>
-                                                   {touched.roof_material && errors.roof_material && (
-                                                      <FormHelperText error id="ht-roof_material">
-                                                         {errors.roof_material}
+                                                   {touched.household_equipment && errors.household_equipment && (
+                                                      <FormHelperText error id="ht-household_equipment">
+                                                         {errors.household_equipment}
                                                       </FormHelperText>
                                                    )}
-                                                </FormControl>
-                                                {/* Material del techo */}
-                                                <FormControl fullWidth sx={{ mb: 5 }}>
-                                                   <FormLabel id="roof_material-label">
-                                                      <Typography variant="h4" component={"p"} mb={1}>
-                                                         <li>Material del piso de la vivienda (si está hecho de más de un matgerial, marca el que predomine):</li>
-                                                      </Typography>
-                                                   </FormLabel>
-                                                   {/* <ToggleButtonGroup color="primary" value={houseIs} exclusive onClick={handleHouseIs}>
-                                                <ToggleButton value="1@Tierra">Tierra</ToggleButton>
-                                                <ToggleButton value="2@Cemento">Cemento</ToggleButton>
-                                                <ToggleButton value="3@Mosaico">Mosaico, loseta, madera laminada</ToggleButton>
-                                             </ToggleButtonGroup> */}
-                                                   <RadioGroup
-                                                      row
-                                                      aria-labelledby="roof_material-label"
-                                                      id="roof_material"
-                                                      name="roof_material"
-                                                      value={values.roof_material}
-                                                      onChange={handleChange}
-                                                      onBlur={handleBlur}
-                                                   >
-                                                      <FormControlLabel sx={{ mr: 5 }} value="2@Tierra" control={<Radio />} label="Tierra" />
-                                                      <FormControlLabel sx={{ mr: 5 }} value="2@Cemento" control={<Radio />} label="Cemento" />
-                                                      <FormControlLabel
-                                                         sx={{ mr: 5 }}
-                                                         value="2@Mosaico"
-                                                         control={<Radio />}
-                                                         label="Mosaico, loseta, madera laminada"
-                                                      />
-                                                   </RadioGroup>
-                                                   {touched.roof_material && errors.roof_material && (
-                                                      <FormHelperText error id="ht-roof_material">
-                                                         {errors.roof_material}
-                                                      </FormHelperText>
-                                                   )}
+                                                   <Grid container spacing={2}>
+                                                      <Grid xs={12} md={6} sx={{ mb: 1 }}>
+                                                         <FormGroup>
+                                                            {/* Agua Potable */}
+                                                            <FormControlLabel
+                                                               control={<Checkbox defaultChecked={values.drinking_water} />}
+                                                               label="Agua Potable"
+                                                               id="drinking_water"
+                                                               name="drinking_water"
+                                                               value={2}
+                                                               onChange={handleChange}
+                                                               onBlur={handleBlur}
+                                                               disabled={values.id == 0 ? false : true}
+                                                               error={errors.drinking_water}
+                                                               touched={touched.drinking_water}
+                                                            />
+                                                            {
+                                                               touched.drinking_water && errors.drinking_water && showErrorInput(4, errors.drinking_water)
+                                                               // <FormHelperText error id="ht-drinking_water">
+                                                               //    {errors.drinking_water}
+                                                               // </FormHelperText>
+                                                            }
+                                                            {/* Luz Eléctrica */}
+                                                            <FormControlLabel
+                                                               control={<Checkbox defaultChecked={values.electric_light} />}
+                                                               label="Luz Eléctrica"
+                                                               id="electric_light"
+                                                               name="electric_light"
+                                                               value={2}
+                                                               onChange={handleChange}
+                                                               onBlur={handleBlur}
+                                                               disabled={values.id == 0 ? false : true}
+                                                               error={errors.electric_light}
+                                                               touched={touched.electric_light}
+                                                            />
+                                                            {
+                                                               touched.electric_light && errors.electric_light && showErrorInput(4, errors.electric_light)
+                                                               // <FormHelperText error id="ht-electric_light">
+                                                               //    {errors.electric_light}
+                                                               // </FormHelperText>
+                                                            }
+                                                            {/* Drenaje */}
+                                                            <FormControlLabel
+                                                               control={<Checkbox defaultChecked={values.sewer_system} />}
+                                                               label="Drenaje"
+                                                               id="sewer_system"
+                                                               name="sewer_system"
+                                                               value={2}
+                                                               onChange={handleChange}
+                                                               onBlur={handleBlur}
+                                                               disabled={values.id == 0 ? false : true}
+                                                               error={errors.sewer_system}
+                                                               touched={touched.sewer_system}
+                                                            />
+                                                            {
+                                                               touched.sewer_system && errors.sewer_system && showErrorInput(4, errors.sewer_system)
+                                                               // <FormHelperText error id="ht-sewer_system">
+                                                               //    {errors.sewer_system}
+                                                               // </FormHelperText>
+                                                            }
+                                                            {/* Pavimento */}
+                                                            <FormControlLabel
+                                                               control={<Checkbox defaultChecked={values.pavement} />}
+                                                               label="Pavimento"
+                                                               id="pavement"
+                                                               name="pavement"
+                                                               value={2}
+                                                               onChange={handleChange}
+                                                               onBlur={handleBlur}
+                                                               disabled={values.id == 0 ? false : true}
+                                                               error={errors.pavement}
+                                                               touched={touched.pavement}
+                                                            />
+                                                            {
+                                                               touched.pavement && errors.pavement && showErrorInput(4, errors.pavement)
+                                                               // <FormHelperText error id="ht-pavement">
+                                                               //    {errors.pavement}
+                                                               // </FormHelperText>
+                                                            }
+                                                         </FormGroup>
+                                                      </Grid>
+                                                      <Grid xs={12} md={6} sx={{ mb: 1 }}>
+                                                         <FormGroup>
+                                                            {/* Automóvil */}
+                                                            <FormControlLabel
+                                                               control={<Checkbox defaultChecked={values.automobile} />}
+                                                               label="Automóvil"
+                                                               id="automobile"
+                                                               name="automobile"
+                                                               value={2}
+                                                               onChange={handleChange}
+                                                               onBlur={handleBlur}
+                                                               disabled={values.id == 0 ? false : true}
+                                                               error={errors.automobile}
+                                                               touched={touched.automobile}
+                                                            />
+                                                            {
+                                                               touched.automobile && errors.automobile && showErrorInput(4, errors.automobile)
+                                                               // <FormHelperText error id="ht-automobile">
+                                                               //    {errors.automobile}
+                                                               // </FormHelperText>
+                                                            }
+                                                            {/* Línea Telefónica */}
+                                                            <FormControlLabel
+                                                               control={<Checkbox defaultChecked={values.phone_line} />}
+                                                               label="Línea Telefónica"
+                                                               id="phone_line"
+                                                               name="phone_line"
+                                                               value={2}
+                                                               onChange={handleChange}
+                                                               onBlur={handleBlur}
+                                                               disabled={values.id == 0 ? false : true}
+                                                               error={errors.phone_line}
+                                                               touched={touched.phone_line}
+                                                            />
+                                                            {
+                                                               touched.phone_line && errors.phone_line && showErrorInput(4, errors.phone_line)
+                                                               // <FormHelperText error id="ht-phone_line">
+                                                               //    {errors.phone_line}
+                                                               // </FormHelperText>
+                                                            }
+                                                            {/* Internet */}
+                                                            <FormControlLabel
+                                                               control={<Checkbox defaultChecked={values.internet} />}
+                                                               label="Internet"
+                                                               id="internet"
+                                                               name="internet"
+                                                               value={2}
+                                                               onChange={handleChange}
+                                                               onBlur={handleBlur}
+                                                               disabled={values.id == 0 ? false : true}
+                                                               error={errors.internet}
+                                                               touched={touched.internet}
+                                                            />
+                                                            {
+                                                               touched.internet && errors.internet && showErrorInput(4, errors.internet)
+                                                               // <FormHelperText error id="ht-internet">
+                                                               //    {errors.internet}
+                                                               // </FormHelperText>
+                                                            }
+                                                         </FormGroup>
+                                                      </Grid>
+                                                   </Grid>
                                                 </FormControl>
                                              </ol>
                                           </Grid>
+                                       </Grid>
 
-                                          <Grid xs={12} md={6} sx={{ mb: 3 }}>
-                                             {/* Alimentación */}
-                                             <Grid xs={12} md={12} sx={{ mb: 3 }}>
-                                                <TextField
-                                                   id="food"
-                                                   name="food"
-                                                   label="Alimentación (despensa) *"
-                                                   type="number"
-                                                   value={values.food}
-                                                   placeholder="Ingrese el gasto mensual de alimentos"
-                                                   onChange={handleChange}
-                                                   onBlur={handleBlur}
-                                                   fullWidth
-                                                   inputProps={{ step: 0.01, min: 0, max: 100000 }}
-                                                   disabled={values.id == 0 ? false : true}
-                                                   error={errors.food && touched.food}
-                                                   helperText={errors.food && touched.food && showErrorInput(4, errors.food)}
-                                                />
-                                             </Grid>
-                                             {/* Transporte */}
-                                             <Grid xs={12} md={12} sx={{ mb: 3 }}>
-                                                <TextField
-                                                   id="transport"
-                                                   name="transport"
-                                                   label="Transporte *"
-                                                   type="number"
-                                                   value={values.transport}
-                                                   placeholder="Ingrese el gasto mensual de transporte"
-                                                   onChange={handleChange}
-                                                   onBlur={handleBlur}
-                                                   fullWidth
-                                                   inputProps={{ step: 0.01, min: 0, max: 100000 }}
-                                                   disabled={values.id == 0 ? false : true}
-                                                   error={errors.transport && touched.transport}
-                                                   helperText={errors.transport && touched.transport && showErrorInput(4, errors.transport)}
-                                                />
-                                             </Grid>
-                                             {/* Vivienda */}
-                                             <Grid xs={12} md={12} sx={{ mb: 3 }}>
-                                                <TextField
-                                                   id="living_place"
-                                                   name="living_place"
-                                                   label="Vivienda (renta, infonavit) *"
-                                                   type="number"
-                                                   value={values.living_place}
-                                                   placeholder="Ingrese el gasto mensual en pago de vivienda"
-                                                   onChange={handleChange}
-                                                   onBlur={handleBlur}
-                                                   fullWidth
-                                                   inputProps={{ step: 0.01, min: 0, max: 100000 }}
-                                                   disabled={values.id == 0 ? false : true}
-                                                   error={errors.living_place && touched.living_place}
-                                                   helperText={errors.living_place && touched.living_place && showErrorInput(4, errors.living_place)}
-                                                />
-                                             </Grid>
-                                          </Grid>
-                                          <Grid xs={12} md={6} sx={{ mb: 3 }}>
-                                             <Grid xs={12} md={12} sx={{ mb: 3 }}></Grid>
-                                             {/* Servicios */}
-                                             <Grid xs={12} md={12} sx={{ mb: 3 }}>
-                                                <TextField
-                                                   id="services"
-                                                   name="services"
-                                                   label="Servicios (agua y luz) *"
-                                                   type="number"
-                                                   value={values.services}
-                                                   placeholder="Ingrese el gasto mensual de alimentos"
-                                                   onChange={handleChange}
-                                                   onBlur={handleBlur}
-                                                   fullWidth
-                                                   inputProps={{ step: 0.01, min: 0, max: 100000 }}
-                                                   disabled={values.id == 0 ? false : true}
-                                                   error={errors.services && touched.services}
-                                                   helperText={errors.services && touched.services && showErrorInput(4, errors.services)}
-                                                />
-                                             </Grid>
-                                             {/* Automovil */}
-                                             <Grid xs={12} md={12} sx={{ mb: 3 }}>
-                                                <TextField
-                                                   id="automobile"
-                                                   name="automobile"
-                                                   label="Automóvil *"
-                                                   type="number"
-                                                   value={values.automobile}
-                                                   placeholder="Ingrese el gasto mensual en su automóvi"
-                                                   onChange={handleChange}
-                                                   onBlur={handleBlur}
-                                                   fullWidth
-                                                   inputProps={{ step: 0.01, min: 0, max: 100000 }}
-                                                   disabled={values.id == 0 ? false : true}
-                                                   error={errors.automobile && touched.automobile}
-                                                   helperText={errors.automobile && touched.automobile && showErrorInput(4, errors.automobile)}
-                                                />
-                                             </Grid>
-                                          </Grid>
-
-                                          {/* Egresos Mensuales Totales */}
-                                          <Grid xs={12} xsOffset={6} md={6} sx={{ mb: 3 }}>
-                                             <TextField
-                                                id="total_expenses"
-                                                name="total_expenses"
-                                                label="TOTAL DE EGRESOS *"
-                                                type="number"
-                                                value={values.total_expenses}
-                                                placeholder="00.00"
-                                                setFieldValue={setFieldValue}
-                                                onChange={handleChange}
-                                                onBlur={handleBlur}
-                                                inputProps={{ step: 0.01, min: 0, max: 100000 }}
-                                                disabled={true}
-                                                error={errors.total_expenses && touched.total_expenses}
-                                                helperText={errors.total_expenses && touched.total_expenses && showErrorInput(4, errors.total_expenses)}
-                                             />
+                                       <ButtonsBeforeOrNext isSubmitting={isSubmitting} />
+                                    </Box>
+                                 )}
+                              </Formik>
+                           )}
+                           {activeStep + 1 == 8 && (
+                              <Formik initialValues={formData} validationSchema={{}} onSubmit={{}}>
+                                 {({ errors, handleBlur, handleChange, handleSubmit, isSubmitting, touched, values, resetForm, setFieldValue, setValues }) => (
+                                    <Box
+                                       sx={{ height: "100%", display: "flex", flexDirection: "column", justifyContent: "space-between" }}
+                                       component={"form"}
+                                       onSubmit={handleSubmit}
+                                    >
+                                       <Grid container spacing={2}>
+                                          <Grid xs={12} md={12} sx={{ mb: 3 }}>
+                                             <ol>
+                                                {/* Programa de Becas */}
+                                                <FormControl fullWidth sx={{ mb: 3 }}>
+                                                   <FormLabel id="scholarship_program-label">
+                                                      <Typography variant="h4" component={"p"} mb={1}>
+                                                         <li>¿Tu familia es beneficiaria de algunas de las siguientes becas?</li>
+                                                      </Typography>
+                                                   </FormLabel>
+                                                   {touched.scholarship_program && errors.scholarship_program && (
+                                                      <FormHelperText error id="ht-scholarship_program">
+                                                         {errors.scholarship_program}
+                                                      </FormHelperText>
+                                                   )}
+                                                   <Grid xs={12} md={12} sx={{ mb: 1 }}>
+                                                      <FormGroup sx={{ display: "flex", flexDirection: "row" }}>
+                                                         {/* Beca de Transporte */}
+                                                         <FormControlLabel
+                                                            control={<Checkbox defaultChecked={values.beca_transport} />}
+                                                            label="Beca de Transporte"
+                                                            id="beca_transport"
+                                                            name="beca_transport"
+                                                            value={2}
+                                                            onChange={handleChange}
+                                                            onBlur={handleBlur}
+                                                            disabled={values.id == 0 ? false : true}
+                                                            error={errors.beca_transport}
+                                                            touched={touched.beca_transport}
+                                                            sx={{ mr: 10 }}
+                                                         />
+                                                         {
+                                                            touched.beca_transport && errors.beca_transport && showErrorInput(4, errors.beca_transport)
+                                                            // <FormHelperText error id="ht-beca_transport">
+                                                            //    {errors.beca_transport}
+                                                            // </FormHelperText>
+                                                         }
+                                                         {/* Beca para el Bienestar Benito Juárez */}
+                                                         <FormControlLabel
+                                                            control={<Checkbox defaultChecked={values.beca_benito_juarez} />}
+                                                            label="Beca para el Bienestar Benito Juárez"
+                                                            id="beca_benito_juarez"
+                                                            name="beca_benito_juarez"
+                                                            value={2}
+                                                            onChange={handleChange}
+                                                            onBlur={handleBlur}
+                                                            disabled={values.id == 0 ? false : true}
+                                                            error={errors.beca_benito_juarez}
+                                                            touched={touched.beca_benito_juarez}
+                                                            sx={{ mr: 10 }}
+                                                         />
+                                                         {
+                                                            touched.beca_benito_juarez && errors.beca_benito_juarez && showErrorInput(4, errors.beca_benito_juarez)
+                                                            // <FormHelperText error id="ht-beca_benito_juarez">
+                                                            //    {errors.beca_benito_juarez}
+                                                            // </FormHelperText>
+                                                         }
+                                                         {/* Otra */}
+                                                         <FormControlLabel
+                                                            control={<Checkbox defaultChecked={values.other} />}
+                                                            label="Otra"
+                                                            id="other"
+                                                            name="other"
+                                                            value={2}
+                                                            onChange={handleChange}
+                                                            onBlur={handleBlur}
+                                                            disabled={values.id == 0 ? false : true}
+                                                            error={errors.other}
+                                                            touched={touched.other}
+                                                            sx={{ mr: 10 }}
+                                                         />
+                                                         {
+                                                            touched.other && errors.other && showErrorInput(4, errors.other)
+                                                            // <FormHelperText error id="ht-other">
+                                                            //    {errors.other}
+                                                            // </FormHelperText>
+                                                         }
+                                                         {/* Beca Jóvenes Construyendo el Futuro */}
+                                                         <FormControlLabel
+                                                            control={<Checkbox defaultChecked={values.beca_jovenes} />}
+                                                            label="Beca Jóvenes Construyendo el Futuro"
+                                                            id="beca_jovenes"
+                                                            name="beca_jovenes"
+                                                            value={2}
+                                                            onChange={handleChange}
+                                                            onBlur={handleBlur}
+                                                            disabled={values.id == 0 ? false : true}
+                                                            error={errors.beca_jovenes}
+                                                            touched={touched.beca_jovenes}
+                                                         />
+                                                         {
+                                                            touched.beca_jovenes && errors.beca_jovenes && showErrorInput(4, errors.beca_jovenes)
+                                                            // <FormHelperText error id="ht-beca_jovenes">
+                                                            //    {errors.beca_jovenes}
+                                                            // </FormHelperText>
+                                                         }
+                                                      </FormGroup>
+                                                   </Grid>
+                                                </FormControl>
+                                             </ol>
                                           </Grid>
                                        </Grid>
 

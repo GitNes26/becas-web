@@ -19,6 +19,7 @@ import UsersView from "../views/admin/UsersView/Index";
 import RelationshipContextProvider from "../context/RelationshipContext";
 import TutorContextProvider from "../context/TutorContext";
 import { loaderIndexUsersView } from "../views/admin/UsersView/Index";
+import FamilyContextProvider from "../context/FamilyContext";
 
 // dashboard routing
 const DashboardDefault = Loadable(lazy(() => import("../views/dashboard/Default")));
@@ -48,7 +49,7 @@ const MainRoutes = {
       //    element: <DashboardDefault />
       // },
       {
-         path: "solicitud-beca/pagina?/:pagina?/folio?:folio?",
+         path: "solicitud-beca/pagina?/:pagina?/folio?/:folio?",
          element: (
             <RequestBecaContextProvider>
                <StudentContextProvider>
@@ -56,7 +57,9 @@ const MainRoutes = {
                      <SchoolContextProvider>
                         <TutorContextProvider>
                            <RelationshipContextProvider>
-                              <RequestBecaView />
+                              <FamilyContextProvider>
+                                 <RequestBecaView />
+                              </FamilyContextProvider>
                            </RelationshipContextProvider>
                         </TutorContextProvider>
                      </SchoolContextProvider>
