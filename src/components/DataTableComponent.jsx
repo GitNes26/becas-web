@@ -23,6 +23,8 @@ import Swal from "sweetalert2";
 import Toast from "../utils/Toast";
 import { QuestionAlertConfig } from "../utils/sAlert";
 import IconDelete from "./icons/IconDelete";
+import { Toolbar } from "primereact/toolbar";
+import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
 
 export default function DataTableComponent({
    columns,
@@ -31,15 +33,21 @@ export default function DataTableComponent({
    setData,
    headerFilters = true,
    rowEdit = false,
+   onRowEditCompleteContinue = null,
+   createData,
+   updateData,
    handleClickAdd,
+   handleClickDeleteContinue,
    refreshTable,
    btnAdd = true,
-   addRow,
+   newRow = null,
    btnsExport = true
 }) {
    const { setLoadingAction, setOpenDialog } = useGlobalContext();
+   const [selectedData, setSelectedData] = useState(null);
 
    const dt = useRef(null);
+   // columns.unshift({ id: 0, label: "Selecciona una opción..." });
 
    // FILTROS
    let filtersColumns = columns.map((c) => [c.field, { value: null, matchMode: FilterMatchMode.STARTS_WITH }]);
@@ -66,65 +74,67 @@ export default function DataTableComponent({
       }
    };
 
-   // const addRow = () => {
-   //    console.log(data);
-   //    const newProducts = {
-   //       // id: cont++,
-   //       code: "",
-   //       name: "",
-   //       description: "",
-   //       image: "",
-   //       price: "",
-   //       category: "",
-   //       quantity: "",
-   //       inventoryStatus: "",
-   //       rating: ""
-   //    };
+   const addRow = () => {
+      console.log(data);
 
-   //    let _products = [...data];
-   //    console.log("_products", _products);
-   //    // let { newData, index } = e;
+      let _data = [...data];
+      console.log("_data", _data);
+      // let { newData, index } = e;
 
-   //    // _products[index] = newData;
-   //    _products.push(newProducts);
+      // _data[index] = newData;
+      _data.push(newRow);
 
-   //    setData(_products);
+      setData(_data);
 
-   //    // setData(newProducts);
-   //    console.log(data);
+      // setData(newRow);
+      console.log(data);
+   };
+
+   const onRowEditComplete = async (e) => {
+      try {
+         console.log(e);
+         let _data = [...data];
+         let { newData, index } = e;
+
+         _data[index] = newData;
+
+         setData(_data);
+         // onRowEditCompleteContinue(newData);
+         const newNewData = newData;
+         delete newNewData.actions;
+         console.log("onRowEditCompleteContinue -> newData", newNewData);
+         let ajaxResponse;
+         if (newNewData.id > 0) ajaxResponse = await updateData(newNewData);
+         else ajaxResponse = await createData(newNewData);
+         console.log(ajaxResponse);
+         Toast.Customizable(ajaxResponse.alert_text, ajaxResponse.alert_icon);
+      } catch (error) {
+         console.log(error);
+         Toast.Error(error);
+      }
+   };
+
+   // const textEditor = (options) => {
+   //    return <InputText type="text" value={options.value} onChange={(e) => options.editorCallback(e.target.value)} />;
    // };
 
-   const onRowEditComplete = (e) => {
-      console.log(e);
-      let _products = [...data];
-      let { newData, index } = e;
+   // const statusEditor = (options) => {
+   //    return (
+   //       <Dropdown
+   //          value={options.value}
+   //          options={statuses}
+   //          onChange={(e) => options.editorCallback(e.value)}
+   //          placeholder="Select a Status"
+   //          itemTemplate={(option) => {
+   //             return <Tag value={option} severity={getSeverity(option)}></Tag>;
+   //          }}
+   //       />
+   //    );
+   // };
 
-      _products[index] = newData;
-
-      setData(_products);
-   };
-
-   const textEditor = (options) => {
-      return <InputText type="text" value={options.value} onChange={(e) => options.editorCallback(e.target.value)} />;
-   };
-
-   const statusEditor = (options) => {
-      return (
-         <Dropdown
-            value={options.value}
-            options={statuses}
-            onChange={(e) => options.editorCallback(e.value)}
-            placeholder="Select a Status"
-            itemTemplate={(option) => {
-               return <Tag value={option} severity={getSeverity(option)}></Tag>;
-            }}
-         />
-      );
-   };
-
-   const priceEditor = (options) => {
-      return <InputNumber value={options.value} onValueChange={(e) => options.editorCallback(e.value)} mode="currency" currency="USD" locale="en-US" />;
-   };
+   // const priceEditor = (options) => {
+   //    return <InputNumber value={options.value} onValueChange={(e) => options.editorCallback(e.value)} mode="currency" currency="USD" locale="en-US" />;
+   // };
 
    //#region EXPORTAR
    const exportColumns = columns.map((col) => {
@@ -202,6 +212,25 @@ export default function DataTableComponent({
          Toast.Error(error);
       }
    };
+   const confirmDeleteSelected = () => {
+      setDeleteDataDialog(true);
+   };
+   const leftToolbarTemplate = () => {
+      return (
+         <div className="flex flex-wrap gap-2">
+            {/* <Button label="New" icon="pi pi-plus" severity="success" onClick={openNew} /> */}
+            <Button variant="contained" color="error" startIcon={<IconDelete />} onClick={confirmDeleteSelected} disabled={!selectedData || !selectedData.length}>
+               Eliminar Seleccionados
+            </Button>
+         </div>
+      );
+   };
+
+   const handleClickDelete = async () => {
+      console.log(selectedData);
+      await handleClickDeleteContinue(selectedData);
+      setSelectedData([]);
+   };
 
    const header = (
       <Box sx={{ display: "flex", gap: 2, justifyContent: "space-between", alignItems: "center" }}>
@@ -219,6 +248,21 @@ export default function DataTableComponent({
                   </IconButton>
                </Tooltip>
             </>
+         )}
+
+         {rowEdit && (
+            <Tooltip title="Eliminar Seleccionados" placement="top">
+               <IconButton
+                  type="button"
+                  variant="text"
+                  color="error"
+                  onClick={handleClickDelete}
+                  disabled={!selectedData || !selectedData.length}
+                  sx={{ borderRadius: "12px", mr: 1 }}
+               >
+                  <i className="pi pi-trash"></i>
+               </IconButton>
+            </Tooltip>
          )}
 
          <Tooltip title="Refrescar Tabla" placement="top">
@@ -252,7 +296,10 @@ export default function DataTableComponent({
       <div className="card p-fluid">
          {/* <Tooltip target=".export-buttons>button" position="bottom" /> */}
          <Card>
+            {/* {rowEdit && <Toolbar className="mb-4" left={leftToolbarTemplate}></Toolbar>} */}
+
             <DataTable
+               ref={dt}
                style={{ borderRadius: "20px" }}
                stripedRows
                // rowHover
@@ -262,7 +309,7 @@ export default function DataTableComponent({
                value={data}
                editMode="row"
                header={header}
-               dataKey="id"
+               dataKey="key"
                paginator
                rowsPerPageOptions={[5, 10, 50, 100, 1000]}
                rows={10}
@@ -278,7 +325,10 @@ export default function DataTableComponent({
                paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
                emptyMessage="No se encontraron registros."
                currentPageReportTemplate="Mostrando del {first} al {last} de {totalRecords} registros"
+               selection={selectedData}
+               onSelectionChange={(e) => setSelectedData(e.value)}
             >
+               <Column selectionMode="multiple" exportable={false}></Column>
                {columns.map((col, index) => (
                   <Column
                      key={index}

@@ -147,7 +147,7 @@ export default function FamilyContextProvider({ children }) {
    const updateFamily = async (family) => {
       let res = CorrectRes;
       try {
-         const axiosData = await Axios.put("/families/update", family);
+         const axiosData = await Axios.put(`/families/update/${family.id}`, family);
          res = axiosData.data.data;
          getFamilies();
          // return res;
@@ -160,10 +160,10 @@ export default function FamilyContextProvider({ children }) {
       return res;
    };
 
-   const deleteFamily = async (id) => {
+   const deleteFamily = async (ids) => {
       try {
          let res = CorrectRes;
-         const axiosData = await Axios.delete(`/families/${id}`);
+         const axiosData = await Axios.post(`/families/destroy`, { ids });
          // console.log("deleteFamily() axiosData", axiosData.data);
          getFamilies();
          res = axiosData.data.data;
@@ -187,6 +187,7 @@ export default function FamilyContextProvider({ children }) {
       <FamilyContext.Provider
          value={{
             families,
+            setFamilies,
             family,
             formData,
             resetFormData,

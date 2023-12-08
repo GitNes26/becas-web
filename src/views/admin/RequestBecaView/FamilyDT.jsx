@@ -1,4 +1,4 @@
-import { Fragment, useEffect, useState } from "react";
+import { Fragment, createFactory, useEffect, useState } from "react";
 import { ThemeProvider } from "@mui/material/styles";
 import { createTheme } from "@mui/material/styles";
 import InputLabel from "@mui/material/InputLabel";
@@ -24,14 +24,31 @@ import { formatCurrency, formatDatetime } from "../../../utils/Formats";
 import { useAuthContext } from "../../../context/AuthContext";
 import SwitchComponent from "../../../components/SwitchComponent";
 import { useParams } from "react-router-dom";
+import { InputNumber } from "primereact/inputnumber";
+import { InputText } from "primereact/inputtext";
+import { Dropdown } from "primereact/dropdown";
+import { Tag } from "@mui/icons-material";
 
 const FamilyDT = () => {
    let { folio, pagina = 0 } = useParams();
 
    const { auth } = useAuthContext();
    const { setLoading, setLoadingAction, setOpenDialog } = useGlobalContext();
-   const { singularName, family, families, setFamilies, getIndexByFolio, deleteFamily, DisEnableFamily, resetFormData, resetFamily, setTextBtnSumbit, setFormTitle } =
-      useFamilyContext();
+   const {
+      singularName,
+      family,
+      families,
+      setFamilies,
+      getIndexByFolio,
+      createFamily,
+      updateFamily,
+      deleteFamily,
+      DisEnableFamily,
+      resetFormData,
+      resetFamily,
+      setTextBtnSumbit,
+      setFormTitle
+   } = useFamilyContext();
    const globalFilterFields = ["relationship", "age", "occupation", "monthly_income", "active", "created_at"];
 
    // #region BodysTemplate
@@ -41,11 +58,72 @@ const FamilyDT = () => {
    const MonthlyIcomeBodyTemplate = (obj) => <Typography textAlign={"center"}>{formatCurrency(obj.monthly_income, true, true)}</Typography>;
    // #endregion BodysTemplate
 
+   // #region BodysTemplateEditor
+   const textEditor = (options) => <InputText type="text" value={options.value} onChange={(e) => options.editorCallback(e.target.value)} />;
+
+   const numberEditor = (options) => <InputText type="number" value={options.value} onChange={(e) => options.editorCallback(e.target.value)} />;
+
+   // const statusEditor = (options) => {
+   //    return (
+   //       <Dropdown
+   //          value={options.value}
+   //          options={statuses}
+   //          onChange={(e) => options.editorCallback(e.value)}
+   //          placeholder="Select a Status"
+   //          itemTemplate={(option) => {
+   //             return <Tag value={option} severity={getSeverity(option)}></Tag>;
+   //          }}
+   //       />
+   //    );
+   // };
+
+   const priceEditor = (options) => (
+      <InputNumber value={options.value} onValueChange={(e) => options.editorCallback(e.value)} mode="currency" currency="MXN" locale="es-MX" />
+   );
+
+   const addRow = () => {
+      console.log("addRow - data", data);
+      const newRow = {
+         id: data.length + 1,
+         beca_id: 1,
+         relationship: "",
+         age: 0,
+         occupation: "",
+         monthly_income: 0,
+         actions: "asa"
+         // finished: false
+      };
+
+      let _data = [...data];
+      console.log("_data", _data);
+      // let { newData, index } = e;
+
+      // _data[index] = newData;
+      _data.push(newRow);
+
+      setFamilies(_data);
+
+      // setData(newRow);
+      console.log(data);
+   };
+   const onRowEditCompleteContinue = async (newData) => {
+      delete newData.actions;
+      console.log("onRowEditCompleteContinue -> newData", newData);
+      const ajaxResponse = await updateFamily(newData);
+      console.log(ajaxResponse);
+      // console.log(e);
+      // let _products = [...data];
+      // let { newData, index } = e;
+      // _products[index] = newData;
+      // setData(_products);
+   };
+   // #endregion BodysTemplateEditor
+
    const columns = [
-      { field: "relationship", header: "Parentesco", sortable: true, functionEdit: null, body: RelationshipBodyTemplate, filterField: null },
-      { field: "age", header: "Edad (años)", sortable: true, functionEdit: null, body: AgeBodyTemplate, filterField: null },
-      { field: "occupation", header: "Ocupación", sortable: true, functionEdit: null, body: OccupationBodyTemplate, filterField: null },
-      { field: "monthly_income", header: "Ingresos Mensuales", sortable: true, functionEdit: null, body: MonthlyIcomeBodyTemplate, filterField: null }
+      { field: "relationship", header: "Parentesco", sortable: true, functionEdit: textEditor, body: RelationshipBodyTemplate, filterField: null },
+      { field: "age", header: "Edad (años)", sortable: true, functionEdit: numberEditor, body: AgeBodyTemplate, filterField: null },
+      { field: "occupation", header: "Ocupación", sortable: true, functionEdit: textEditor, body: OccupationBodyTemplate, filterField: null },
+      { field: "monthly_income", header: "Ingresos Mensuales", sortable: true, functionEdit: priceEditor, body: MonthlyIcomeBodyTemplate, filterField: null }
    ];
 
    const mySwal = withReactContent(Swal);
@@ -77,12 +155,19 @@ const FamilyDT = () => {
       }
    };
 
-   const handleClickDelete = async (id, name) => {
+   const handleClickDeleteContinue = async (selectedData) => {
       try {
-         mySwal.fire(QuestionAlertConfig(`Estas seguro de eliminar a ${name}`)).then(async (result) => {
+         let ids = selectedData.map((d) => d.id);
+         console.log("ids", ids, "cuantos: " + ids.length);
+         if (ids.length < 1) console.log("no hay registros");
+         console.log(ids);
+         let msg = `¿Estas seguro de eliminar `;
+         if (selectedData.length === 1) msg += `al familiar registrado como tu ${selectedData[0].relationship}?`;
+         else if (selectedData.length > 1) msg += `a los familiares registrados como tu ${selectedData.map((d) => d.relationship)}?`;
+         mySwal.fire(QuestionAlertConfig(msg)).then(async (result) => {
             if (result.isConfirmed) {
                setLoadingAction(true);
-               const axiosResponse = await deleteFamily(id);
+               const axiosResponse = await deleteFamily(ids);
                setLoadingAction(false);
                Toast.Customizable(axiosResponse.alert_text, axiosResponse.alert_icon);
             }
@@ -114,10 +199,11 @@ const FamilyDT = () => {
    const formatData = async () => {
       try {
          console.log("cargar listado", families);
-         await families.map((obj) => {
+         await families.map((obj, index) => {
             console.log(obj);
             let register = obj;
-            register.actions = <ButtonsAction id={obj.id} name={obj.family} active={obj.active} />;
+            register.key = index + 1;
+            // register.actions = <ButtonsAction id={obj.id} name={obj.family} active={obj.active} />;
             data.push(register);
          });
          // if (data.length > 0) setGlobalFilterFields(Object.keys(families[0]));
@@ -130,29 +216,14 @@ const FamilyDT = () => {
    };
    formatData();
 
-   const addRow = () => {
-      console.log("addRow - data", data);
-      const newRow = {
-         id: data.length + 1,
-         beca_id: 1,
-         relationship: "",
-         age: 0,
-         occupation: "",
-         monthly_income: 0
-         // finished: false
-      };
-
-      let _data = [...data];
-      console.log("_data", _data);
-      // let { newData, index } = e;
-
-      // _data[index] = newData;
-      _data.push(newRow);
-
-      setFamilies(_data);
-
-      // setData(newRow);
-      console.log(data);
+   const newRow = {
+      key: data.length + 1,
+      beca_id: folio,
+      relationship: "",
+      age: "",
+      occupation: "",
+      monthly_income: ""
+      // finished: false
    };
 
    useEffect(() => {
@@ -169,9 +240,13 @@ const FamilyDT = () => {
          headerFilters={false}
          handleClickAdd={handleClickAdd}
          rowEdit={true}
+         // onRowEditCompleteContinue={onRowEditCompleteContinue}
+         createData={createFamily}
+         updateData={updateFamily}
          btnAdd={true}
-         addRow={addRow}
-         refreshTable={getIndexByFolio(folio)}
+         newRow={newRow}
+         handleClickDeleteContinue={handleClickDeleteContinue}
+         refreshTable={(e) => getIndexByFolio(folio)}
          btnsExport={false}
       />
    );
