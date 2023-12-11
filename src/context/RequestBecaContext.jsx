@@ -10,7 +10,7 @@ const formDataInitialState = {
    folio: "",
 
    tutor_data_id: "",
-   tutor_relationship_id: "",
+   tutor_relationship_id: 0,
    tutor_relationship: "Selecciona una opción...",
    tutor_curp: "",
    tutor_name: "",
@@ -35,12 +35,25 @@ const formDataInitialState = {
    street: "",
    num_ext: "",
    num_int: "",
-   disability_id: "",
+   disability_id: 0,
    disability: "Selecciona una opción...",
 
-   school_id: "",
+   school_id: 0,
+   school: "Selecciona una opción...",
    grade: "",
-   average: ""
+   average: "",
+   comments: "",
+
+   extra_income: "",
+   monthly_income: "",
+
+   total_expenses: "",
+   under_protest: "",
+
+   socioeconomic_study: "",
+   status: "",
+   end_date: ""
+   // # id, folio, user_id, tutor_data_id, student_data_id, school_id, grade, average, extra_income, monthly_income, total_expenses, under_protest, comments, socioeconomic_study, status, end_date, active, created_at,
 };
 
 // const formDataInitialState = {

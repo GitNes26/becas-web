@@ -27,24 +27,27 @@ import { Toolbar } from "primereact/toolbar";
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
 
 export default function DataTableComponent({
+   idName = "table",
    columns,
    globalFilterFields,
    data,
    setData,
    headerFilters = true,
    rowEdit = false,
-   onRowEditCompleteContinue = null,
-   createData,
-   updateData,
    handleClickAdd,
+   createData,
+   onRowEditCompleteContinue = null,
+   updateData,
    handleClickDeleteContinue,
    refreshTable,
    btnAdd = true,
    newRow = null,
-   btnsExport = true
+   btnsExport = true,
+   showGridlines = false
 }) {
    const { setLoadingAction, setOpenDialog } = useGlobalContext();
    const [selectedData, setSelectedData] = useState(null);
+   const [updating, setUpdating] = useState(false);
 
    const dt = useRef(null);
    // columns.unshift({ id: 0, label: "Selecciona una opción..." });
@@ -75,24 +78,40 @@ export default function DataTableComponent({
    };
 
    const addRow = () => {
-      console.log(data);
+      // console.log(data);
+      // console.log("newRow", newRow);
 
       let _data = [...data];
-      console.log("_data", _data);
-      // let { newData, index } = e;
+      // console.log("_data", _data);
+      // // let { newData, index } = e;
 
-      // _data[index] = newData;
-      _data.push(newRow);
+      // // _data[index] = newData;
+      _data.unshift(newRow);
 
       setData(_data);
 
-      // setData(newRow);
-      console.log(data);
+      document.querySelector(`#${idName} tbody`).childNodes[0].querySelector("button").click();
+      // // setData(newRow);
+      // console.log(data);
+   };
+
+   const handleOnRowEditIinit = (e) => {
+      setUpdating(true);
+      const firtsColumn = e.originalEvent.target.closest("tr").childNodes[1];
+      firtsColumn.querySelector(".p-inputtext");
+   };
+   const handleOnRowEditCancel = (e) => {
+      setUpdating(false);
+      const dataSelected = e.data;
+      if (dataSelected.relationship == "" && dataSelected.age == "" && dataSelected.occupation == "" && dataSelected.monthly_income == null) {
+         let _data = data.filter((val) => val.id !== dataSelected.id);
+         setData(_data);
+      }
    };
 
    const onRowEditComplete = async (e) => {
       try {
-         console.log(e);
+         // console.log(e);
          let _data = [...data];
          let { newData, index } = e;
 
@@ -102,15 +121,15 @@ export default function DataTableComponent({
          // onRowEditCompleteContinue(newData);
          const newNewData = newData;
          delete newNewData.actions;
-         console.log("onRowEditCompleteContinue -> newData", newNewData);
          let ajaxResponse;
          if (newNewData.id > 0) ajaxResponse = await updateData(newNewData);
          else ajaxResponse = await createData(newNewData);
-         console.log(ajaxResponse);
          Toast.Customizable(ajaxResponse.alert_text, ajaxResponse.alert_icon);
+         setUpdating(false);
       } catch (error) {
          console.log(error);
          Toast.Error(error);
+         setUpdating(false);
       }
    };
 
@@ -227,7 +246,7 @@ export default function DataTableComponent({
    };
 
    const handleClickDelete = async () => {
-      console.log(selectedData);
+      // console.log(selectedData);
       await handleClickDeleteContinue(selectedData);
       setSelectedData([]);
    };
@@ -252,16 +271,18 @@ export default function DataTableComponent({
 
          {rowEdit && (
             <Tooltip title="Eliminar Seleccionados" placement="top">
-               <IconButton
-                  type="button"
-                  variant="text"
-                  color="error"
-                  onClick={handleClickDelete}
-                  disabled={!selectedData || !selectedData.length}
-                  sx={{ borderRadius: "12px", mr: 1 }}
-               >
-                  <i className="pi pi-trash"></i>
-               </IconButton>
+               <span>
+                  <IconButton
+                     type="button"
+                     variant="text"
+                     color="error"
+                     onClick={handleClickDelete}
+                     disabled={!selectedData || !selectedData.length}
+                     sx={{ borderRadius: "12px", mr: 1 }}
+                  >
+                     <i className="pi pi-trash"></i>
+                  </IconButton>
+               </span>
             </Tooltip>
          )}
 
@@ -280,6 +301,7 @@ export default function DataTableComponent({
                sx={{ width: 250 }}
                startIcon={<AddCircleOutlineOutlined sx={{ mr: 0.2 }} />}
                size="large"
+               disabled={updating}
                onClick={() => (rowEdit ? addRow() : handleClickAdd())}
             >
                AGREGAR
@@ -299,11 +321,13 @@ export default function DataTableComponent({
             {/* {rowEdit && <Toolbar className="mb-4" left={leftToolbarTemplate}></Toolbar>} */}
 
             <DataTable
+               id={idName}
+               name={idName}
                ref={dt}
                style={{ borderRadius: "20px" }}
                stripedRows
                // rowHover
-               // showGridlines
+               showGridlines={showGridlines}
                removableSort
                size="small"
                value={data}
@@ -320,13 +344,15 @@ export default function DataTableComponent({
                globalFilter={globalFilterValue}
                globalFilterFields={globalFilterFields}
                filterDisplay={headerFilters ? "row" : "menu"}
-               onRowEditComplete={onRowEditComplete}
                tableStyle={{ minWidth: "50rem" }}
                paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
                emptyMessage="No se encontraron registros."
                currentPageReportTemplate="Mostrando del {first} al {last} de {totalRecords} registros"
                selection={selectedData}
                onSelectionChange={(e) => setSelectedData(e.value)}
+               onRowEditComplete={onRowEditComplete}
+               onRowEditInit={handleOnRowEditIinit}
+               onRowEditCancel={handleOnRowEditCancel}
             >
                <Column selectionMode="multiple" exportable={false}></Column>
                {columns.map((col, index) => (

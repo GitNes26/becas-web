@@ -88,6 +88,8 @@ const RequestBecaView = () => {
    const inputRefCurp = useRef(null);
    const inputRefSchoolId = useRef(null);
 
+   const [monthlyIncome, setMonthlyIncome] = useState(0);
+
    const [formDataTutor, setFormDataTutor] = useState({
       id: 0,
       tutor_curp: "",
@@ -609,7 +611,7 @@ const RequestBecaView = () => {
          // inputRefFullNameTutor.current.focus();
          // console.log("useEffect - formData", formData);
       }
-   }, [formData]);
+   }, []);
    // }, [formData, pagina, activeStep]);
 
    return (
@@ -1136,7 +1138,7 @@ const RequestBecaView = () => {
                                              <Typography variant="h2" mb={2}>
                                                 ¿Quienes viven actualmente con el alumno?
                                              </Typography>
-                                             <FamilyDT />
+                                             <FamilyDT setMonthlyIncome={setMonthlyIncome} />
                                           </Grid>
 
                                           {/* Ingresos Extra */}

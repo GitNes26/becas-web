@@ -28,8 +28,9 @@ import { InputNumber } from "primereact/inputnumber";
 import { InputText } from "primereact/inputtext";
 import { Dropdown } from "primereact/dropdown";
 import { Tag } from "@mui/icons-material";
+import { useRequestBecaContext } from "../../../context/RequestBecaContext";
 
-const FamilyDT = () => {
+const FamilyDT = ({ setMonthlyIncome }) => {
    let { folio, pagina = 0 } = useParams();
 
    const { auth } = useAuthContext();
@@ -52,14 +53,18 @@ const FamilyDT = () => {
    const globalFilterFields = ["relationship", "age", "occupation", "monthly_income", "active", "created_at"];
 
    // #region BodysTemplate
-   const RelationshipBodyTemplate = (obj) => <Typography textAlign={"center"}>{obj.relationship.toUpperCase()}</Typography>;
+   const RelationshipBodyTemplate = (obj) => <Typography textAlign={"center"}>{obj.relationship ? obj.relationship.toUpperCase() : ""} </Typography>;
    const AgeBodyTemplate = (obj) => <Typography textAlign={"center"}>{obj.age}</Typography>;
    const OccupationBodyTemplate = (obj) => <Typography textAlign={"center"}>{obj.occupation}</Typography>;
    const MonthlyIcomeBodyTemplate = (obj) => <Typography textAlign={"center"}>{formatCurrency(obj.monthly_income, true, true)}</Typography>;
    // #endregion BodysTemplate
 
    // #region BodysTemplateEditor
-   const textEditor = (options) => <InputText type="text" value={options.value} onChange={(e) => options.editorCallback(e.target.value)} />;
+   const textEditor = (options) => <InputText type="text" value={options.value ? options.value : ""} onChange={(e) => options.editorCallback(e.target.value)} />;
+
+   const textMayusEditor = (options) => (
+      <InputText type="text" value={options.value ? options.value : ""} onChange={(e) => options.editorCallback(e.target.value.toUpperCase())} />
+   );
 
    const numberEditor = (options) => <InputText type="number" value={options.value} onChange={(e) => options.editorCallback(e.target.value)} />;
 
@@ -81,48 +86,48 @@ const FamilyDT = () => {
       <InputNumber value={options.value} onValueChange={(e) => options.editorCallback(e.value)} mode="currency" currency="MXN" locale="es-MX" />
    );
 
-   const addRow = () => {
-      console.log("addRow - data", data);
-      const newRow = {
-         id: data.length + 1,
-         beca_id: 1,
-         relationship: "",
-         age: 0,
-         occupation: "",
-         monthly_income: 0,
-         actions: "asa"
-         // finished: false
-      };
+   // const addRow = () => {
+   //    console.log("addRow - data", data);
+   //    const newRow = {
+   //       id: data.length + 1,
+   //       beca_id: 1,
+   //       relationship: "",
+   //       age: 0,
+   //       occupation: "",
+   //       monthly_income: 0,
+   //       actions: "asa"
+   //       // finished: false
+   //    };
 
-      let _data = [...data];
-      console.log("_data", _data);
-      // let { newData, index } = e;
+   //    let _data = [...data];
+   //    console.log("_data", _data);
+   //    // let { newData, index } = e;
 
-      // _data[index] = newData;
-      _data.push(newRow);
+   //    // _data[index] = newData;
+   //    _data.push(newRow);
 
-      setFamilies(_data);
+   //    setFamilies(_data);
 
-      // setData(newRow);
-      console.log(data);
-   };
-   const onRowEditCompleteContinue = async (newData) => {
-      delete newData.actions;
-      console.log("onRowEditCompleteContinue -> newData", newData);
-      const ajaxResponse = await updateFamily(newData);
-      console.log(ajaxResponse);
-      // console.log(e);
-      // let _products = [...data];
-      // let { newData, index } = e;
-      // _products[index] = newData;
-      // setData(_products);
-   };
+   //    // setData(newRow);
+   //    console.log(data);
+   // };
+   // const onRowEditCompleteContinue = async (newData) => {
+   //    delete newData.actions;
+   //    console.log("onRowEditCompleteContinue -> newData", newData);
+   //    const ajaxResponse = await updateFamily(newData);
+   //    console.log(ajaxResponse);
+   //    // console.log(e);
+   //    // let _products = [...data];
+   //    // let { newData, index } = e;
+   //    // _products[index] = newData;
+   //    // setData(_products);
+   // };
    // #endregion BodysTemplateEditor
 
    const columns = [
-      { field: "relationship", header: "Parentesco", sortable: true, functionEdit: textEditor, body: RelationshipBodyTemplate, filterField: null },
+      { field: "relationship", header: "Parentesco", sortable: true, functionEdit: textMayusEditor, body: RelationshipBodyTemplate, filterField: null },
       { field: "age", header: "Edad (años)", sortable: true, functionEdit: numberEditor, body: AgeBodyTemplate, filterField: null },
-      { field: "occupation", header: "Ocupación", sortable: true, functionEdit: textEditor, body: OccupationBodyTemplate, filterField: null },
+      { field: "occupation", header: "Ocupación", sortable: true, functionEdit: textMayusEditor, body: OccupationBodyTemplate, filterField: null },
       { field: "monthly_income", header: "Ingresos Mensuales", sortable: true, functionEdit: priceEditor, body: MonthlyIcomeBodyTemplate, filterField: null }
    ];
 
@@ -158,9 +163,7 @@ const FamilyDT = () => {
    const handleClickDeleteContinue = async (selectedData) => {
       try {
          let ids = selectedData.map((d) => d.id);
-         console.log("ids", ids, "cuantos: " + ids.length);
          if (ids.length < 1) console.log("no hay registros");
-         console.log(ids);
          let msg = `¿Estas seguro de eliminar `;
          if (selectedData.length === 1) msg += `al familiar registrado como tu ${selectedData[0].relationship}?`;
          else if (selectedData.length > 1) msg += `a los familiares registrados como tu ${selectedData.map((d) => d.relationship)}?`;
@@ -198,14 +201,23 @@ const FamilyDT = () => {
    const data = [];
    const formatData = async () => {
       try {
-         console.log("cargar listado", families);
+         // console.log("cargar listado", families);
+         let monthlyIncome = 0;
+         setMonthlyIncome(monthlyIncome);
+         families.sort((a, b) => a.id - b.id);
+
          await families.map((obj, index) => {
-            console.log(obj);
+            // console.log(obj);
             let register = obj;
             register.key = index + 1;
             // register.actions = <ButtonsAction id={obj.id} name={obj.family} active={obj.active} />;
             data.push(register);
+
+            monthlyIncome += Number(obj.monthly_income);
          });
+         setMonthlyIncome(monthlyIncome);
+         // console.log("cargar listado", families);
+
          // if (data.length > 0) setGlobalFilterFields(Object.keys(families[0]));
          // console.log("la data del formatData", globalFilterFields);
          setLoading(false);
@@ -217,13 +229,12 @@ const FamilyDT = () => {
    formatData();
 
    const newRow = {
-      key: data.length + 1,
+      key: 0,
       beca_id: folio,
       relationship: "",
       age: "",
       occupation: "",
       monthly_income: ""
-      // finished: false
    };
 
    useEffect(() => {
@@ -233,6 +244,7 @@ const FamilyDT = () => {
 
    return (
       <DataTableComponent
+         idName="dtFamilies"
          columns={columns}
          data={data}
          setData={setFamilies}

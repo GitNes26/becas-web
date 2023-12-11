@@ -143,7 +143,7 @@ const RequestBecaDT = () => {
          <ButtonGroup variant="outlined">
             <Tooltip title={`Solicitud ${name}`} placement="top">
                <Button color="primary">
-                  <Link to={`/admin/solicitud-beca/${id}`} style={{ textDecoration: "none" }}>
+                  <Link to={`/admin/solicitud-beca/pagina/4/folio/${id}`} target="_blank" style={{ textDecoration: "none" }}>
                      {/* <IconEye /> */}
                      Continuar
                   </Link>
