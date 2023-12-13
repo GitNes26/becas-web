@@ -30,7 +30,9 @@ import { Dropdown } from "primereact/dropdown";
 import { Tag } from "@mui/icons-material";
 import { useRequestBecaContext } from "../../../context/RequestBecaContext";
 
-const FamilyDT = ({ setMonthlyIncome }) => {
+export let monthlyIncome = 0;
+
+const FamilyDT = ({ becaId }) => {
    let { folio, pagina = 0 } = useParams();
 
    const { auth } = useAuthContext();
@@ -202,9 +204,8 @@ const FamilyDT = ({ setMonthlyIncome }) => {
    const formatData = async () => {
       try {
          // console.log("cargar listado", families);
-         let monthlyIncome = 0;
-         setMonthlyIncome(monthlyIncome);
          families.sort((a, b) => a.id - b.id);
+         monthlyIncome = 0;
 
          await families.map((obj, index) => {
             // console.log(obj);
@@ -215,7 +216,8 @@ const FamilyDT = ({ setMonthlyIncome }) => {
 
             monthlyIncome += Number(obj.monthly_income);
          });
-         setMonthlyIncome(monthlyIncome);
+         // setMonthlyIncome(monthlyIncome);
+         // monthlyIncomeChange();
          // console.log("cargar listado", families);
 
          // if (data.length > 0) setGlobalFilterFields(Object.keys(families[0]));
@@ -230,7 +232,7 @@ const FamilyDT = ({ setMonthlyIncome }) => {
 
    const newRow = {
       key: 0,
-      beca_id: folio,
+      beca_id: becaId,
       relationship: "",
       age: "",
       occupation: "",

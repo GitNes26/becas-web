@@ -51,7 +51,8 @@ import SimpleTableComponent from "../../../components/SimpleTableComponent";
 import { AddCircleOutlineOutlined } from "@mui/icons-material";
 import InputComponentv2, { InputComponentv3 } from "../../../components/Form/InputComponent2";
 import IconDelete from "../../../components/icons/IconDelete";
-import FamilyDT from "./FamilyDT";
+import FamilyDT, { monthlyIncome } from "./FamilyDT";
+import { useFamilyContext } from "../../../context/FamilyContext";
 
 const RequestBecaView = () => {
    // const { result } = useLoaderData();
@@ -74,12 +75,14 @@ const RequestBecaView = () => {
       setDataColoniesComplete
    } = useGlobalContext();
 
+   // const { getIndexByFolio, families } = useFamilyContext();
+
    const { disabilities, getDisabilitiesSelectIndex } = useDisabilityContext();
    const { relationships, getRelationshipsSelectIndex } = useRelationshipContext();
    const { schools, getSchoolsSelectIndex } = useSchoolContext();
    const { getStudentByCURP } = useStudentContext();
    const { getTutorByCURP } = useTutorContext();
-   const { formData, setFormData, resetFormData, showRequestBeca, createRequestBeca, updateRequestBeca } = useRequestBecaContext();
+   const { formData, setFormData, resetFormData, getRequestBecasByFolio, createRequestBeca, updateRequestBeca, saveBeca } = useRequestBecaContext();
    const [isTutor, setIsTutor] = useState(false); // es true cuando el tutor no es el padre ni la madre
    const [imgIne, setImgIne] = useState([]);
    const [imgPowerLetter, setImgPowerLetter] = useState([]);
@@ -88,7 +91,7 @@ const RequestBecaView = () => {
    const inputRefCurp = useRef(null);
    const inputRefSchoolId = useRef(null);
 
-   const [monthlyIncome, setMonthlyIncome] = useState(0);
+   // const [monthlyIncomeChange, setMonthlyIncomeChange] = useState(0);
 
    const [formDataTutor, setFormDataTutor] = useState({
       id: 0,
@@ -443,23 +446,21 @@ const RequestBecaView = () => {
    const onSubmit4 = async (values, { setSubmitting, setErrors, resetForm, setValues }) => {
       try {
          // console.log("formData en submit3", formData);
-         await setFormData(values);
-         await setValues(formData);
-         // console.log(formData);
+         await setFormData({ ...formData, ...values });
+         // await setFormData(values);
+         // await setValues(formData);
+         // return console.log(formData, values);
          setLoadingAction(true);
-         let axiosResponse;
-         if (values.id == 0) axiosResponse = await createRequestBeca(formData);
-         else axiosResponse = await updateRequestBeca(formData);
+         const axiosResponse = await saveBeca(folio, pagina, values);
          setSubmitting(false);
          setLoadingAction(false);
 
          if (axiosResponse.status_code != 200) return Toast.Error(axiosResponse.alert_text);
-         sAlert.Customizable(axiosResponse.alert_text, axiosResponse.alert_icon);
+         Toast.Customizable(axiosResponse.alert_text, axiosResponse.alert_icon);
          // console.log("axiosResponse", axiosResponse);
-         folio = axiosResponse.result.folio;
          setStepFailed(-1);
-         resetForm();
-         resetFormData();
+         // resetForm();
+         // resetFormData();
          handleComplete();
          // if (!checkAdd) setOpenDialog(false);
       } catch (error) {
@@ -526,13 +527,11 @@ const RequestBecaView = () => {
                // comments: Yup.string().trim().required("Comentarios requeridos"),
             });
             break;
-         case 4:
+         case 4: // PAGINA DATOS DE LA ESCUELA
             validationSchema = Yup.object().shape({
                // id: 0,
-               school_id: Yup.number("Solo números").required("Escuela requerida"),
-               grade: Yup.number("Solo números").required("Grado estudiantil requerido"),
-               average: Yup.number("Solo números").required("Promedio actual requerido")
-               // comments: Yup.string().trim().required("Comentarios requeridos"),
+               extra_income: Yup.number("Solo números").min(0, "No puedes poner valores negativos").required("Ingresos Extra requerido"),
+               monthly_income: Yup.number("Solo números").min(0, "No puedes poner valores negativos").required("Ingresos Mensuales requerido")
             });
             break;
          case 5:
@@ -549,20 +548,6 @@ const RequestBecaView = () => {
       return validationSchema;
    };
 
-   // const columns = [
-   //    { id: "relationship", label: "Parentesco", minWidth: 100, format: (value) => value.toUpperCase() },
-   //    { id: "age", label: "Edad", minWidth: 100, align: "center" },
-   //    { id: "occupation", label: "Ocupación", minWidth: 100, align: "center" },
-   //    { id: "monthly_income", label: "Ingresos Mensuales", minWidth: 50, align: "center", format: (value) => formatCurrency(value, true) },
-   //    { id: "actions", label: "Acciones", minWidth: 100, align: "center" }
-   //    // {
-   //    //    id: "density",
-   //    //    label: "Density",
-   //    //    minWidth: 170,
-   //    //    align: "right",
-   //    //    format: (value) => value.toFixed(2)
-   //    // }
-   // ];
    const ButtonsAction = ({ id, name, active }) => {
       return (
          <ButtonGroup variant="outlined">
@@ -593,13 +578,23 @@ const RequestBecaView = () => {
       setHouseIs(event.target.value);
    };
 
+   // const monthlyIncomeChange = (values, setValues) => {
+   //    console.log("values", values);
+   //    console.log("monthlyIncome cambio: ", monthlyIncome);
+   //    formData.monthly_income = monthlyIncome;
+   //    values.monthly_income = monthlyIncome;
+   //    setValues(values);
+   //    // setFieldValue("monthly_income", monthlyIncome);
+   // };
+
    useEffect(() => {
       console.log("formData", formData);
+      // console.log("monthlyIncome", monthlyIncome);
       if (formData.id < 1) {
          console.log("folio de params?", folio);
          console.log("pagina de params?", pagina);
          if (folio) {
-            showRequestBeca(folio);
+            getRequestBecasByFolio(folio);
             console.log("holaaaaa familia");
             console.log("formData", formData);
          }
@@ -607,6 +602,7 @@ const RequestBecaView = () => {
          getSchoolsSelectIndex();
          getRelationshipsSelectIndex();
          setLoading(false);
+
          // window.location.hash = ;
          // inputRefFullNameTutor.current.focus();
          // console.log("useEffect - formData", formData);
@@ -1125,7 +1121,7 @@ const RequestBecaView = () => {
                               </Formik>
                            )}
                            {activeStep + 1 == 4 && (
-                              <Formik initialValues={formData} validationSchema={validationSchemas(activeStep + 1)} onSubmit={{}}>
+                              <Formik initialValues={formData} validationSchema={validationSchemas(activeStep + 1)} onSubmit={onSubmit4}>
                                  {({ errors, handleBlur, handleChange, handleSubmit, isSubmitting, touched, values, resetForm, setFieldValue, setValues }) => (
                                     <Box
                                        sx={{ height: "100%", display: "flex", flexDirection: "column", justifyContent: "space-between" }}
@@ -1138,7 +1134,7 @@ const RequestBecaView = () => {
                                              <Typography variant="h2" mb={2}>
                                                 ¿Quienes viven actualmente con el alumno?
                                              </Typography>
-                                             <FamilyDT setMonthlyIncome={setMonthlyIncome} />
+                                             <FamilyDT becaId={formData.id} monthlyIncomeChange={() => monthlyIncomeChange(values, setValues)} />
                                           </Grid>
 
                                           {/* Ingresos Extra */}
@@ -1167,11 +1163,11 @@ const RequestBecaView = () => {
                                                 label="Ingresos Mensuales TOTALES *"
                                                 type="number"
                                                 value={values.monthly_income}
-                                                placeholder="1,500.00"
+                                                placeholder="9,999.00"
                                                 onChange={handleChange}
                                                 onBlur={handleBlur}
                                                 fullWidth
-                                                inputProps={{ step: 0.01, min: 0, max: 100000, readOnly: true }}
+                                                inputProps={{ step: 0.01, min: 0, max: 100000 }}
                                                 disabled={values.id == 0 ? false : true}
                                                 error={errors.monthly_income && touched.monthly_income}
                                                 helperText={errors.monthly_income && touched.monthly_income && showErrorInput(4, errors.monthly_income)}
