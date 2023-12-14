@@ -169,13 +169,15 @@ const RequestBecaView = () => {
             : activeStep + 1;
 
       setActiveStep(newActiveStep);
-      location.hash = `/admin/solicitud-beca/pagina/${activeStep + 2}`;
+      if (pagina >= 4) location.hash = `/admin/solicitud-beca/pagina/${activeStep + 2}/folio/${folio}`;
+      else location.hash = `/admin/solicitud-beca/pagina/${activeStep + 2}`;
       console.log("adelanteeeeeee");
    };
 
    const handleBack = () => {
       setActiveStep((prevActiveStep) => prevActiveStep - 1);
-      location.hash = `/admin/solicitud-beca/pagina/${activeStep}`;
+      if (pagina >= 4) location.hash = `/admin/solicitud-beca/pagina/${activeStep}/folio/${folio}`;
+      else location.hash = `/admin/solicitud-beca/pagina/${activeStep}`;
       console.log("atrassssss");
    };
 
@@ -199,7 +201,7 @@ const RequestBecaView = () => {
       // }, 1000);
    };
 
-   const ButtonsBeforeOrNext = ({ isSubmitting }) => (
+   const ButtonsBeforeOrNext = ({ isSubmitting, setValues }) => (
       <Box sx={{ display: "flex", flexDirection: "row", pt: 2 }}>
          <Button color="inherit" variant="contained" disabled={activeStep === 0} onClick={handleBack} sx={{ mr: 1 }}>
             ATRAS
@@ -238,6 +240,9 @@ const RequestBecaView = () => {
                   {completedSteps() === totalSteps() - 1 ? "ENVIAR SOLICITUD" : "ADELANTE"}
                </Button>
             ))}
+         <Button type="button" color="info" id="btnModify" sx={{ mt: 1, display: "none" }} onClick={() => handleModify(setValues)}>
+            setValues
+         </Button>
       </Box>
    );
    //#endregion
@@ -446,6 +451,37 @@ const RequestBecaView = () => {
    const onSubmit4 = async (values, { setSubmitting, setErrors, resetForm, setValues }) => {
       try {
          // console.log("formData en submit3", formData);
+         values.b3_finished = true;
+         await setFormData({ ...formData, ...values });
+         // await setFormData(values);
+         // await setValues(formData);
+         // return console.log(formData, values);
+         setLoadingAction(true);
+         const axiosResponse = await saveBeca(folio, pagina, values);
+         setSubmitting(false);
+         setLoadingAction(false);
+
+         if (axiosResponse.status_code != 200) return Toast.Error(axiosResponse.alert_text);
+         Toast.Customizable(axiosResponse.alert_text, axiosResponse.alert_icon);
+         // console.log("axiosResponse", axiosResponse);
+         setStepFailed(-1);
+         // resetForm();
+         // resetFormData();
+         handleComplete();
+         // if (!checkAdd) setOpenDialog(false);
+      } catch (error) {
+         console.error(error);
+         setErrors({ submit: error.message });
+         setSubmitting(false);
+      } finally {
+         setSubmitting(false);
+      }
+   };
+
+   const onSubmit5 = async (values, { setSubmitting, setErrors, resetForm, setValues }) => {
+      try {
+         // console.log("formData en submit3", formData);
+         values.b4_finished = true;
          await setFormData({ ...formData, ...values });
          // await setFormData(values);
          // await setValues(formData);
@@ -535,6 +571,14 @@ const RequestBecaView = () => {
             });
             break;
          case 5:
+            validationSchema = Yup.object().shape({
+               // id: 0,
+               food: Yup.number("Solo números").min(0, "No puedes poner valores negativos").required("Gastos de Alimentación requerido"),
+               transport: Yup.number("Solo números").min(0, "No puedes poner valores negativos").required("Gastos de Transporte requerido"),
+               living_place: Yup.number("Solo números").min(0, "No puedes poner valores negativos").required("Gastos de Vivienda requerido"),
+               services: Yup.number("Solo números").min(0, "No puedes poner valores negativos").required("Gastos de Servicios requerido"),
+               automobile: Yup.number("Solo números").min(0, "No puedes poner valores negativos").required("Gastos del Automóvil requerido")
+            });
             break;
          case 6:
             break;
@@ -587,16 +631,38 @@ const RequestBecaView = () => {
    //    // setFieldValue("monthly_income", monthlyIncome);
    // };
 
+   const handleModify = async (setValues) => {
+      try {
+         const ajaxResponse = await getRequestBecasByFolio(folio);
+         console.log("holaaaaa familia", ajaxResponse.result.requestBecas);
+         if (formData.description) formData.description == null && (formData.description = "");
+         setValues(ajaxResponse.result.requestBecas);
+      } catch (error) {
+         console.log(error);
+         Toast.Error(error);
+      }
+   };
+
+   const handleChangeTotal = (e, values, setFieldValue) => {
+      console.log("value", e.target.name);
+      const name = e.target.name;
+      const value = Number(e.target.value);
+      const b3_food = name == "b3_food" ? value : values.b3_food,
+         b3_transport = name == "b3_transport" ? value : values.b3_transport,
+         b3_living_place = name == "b3_living_place" ? value : values.b3_living_place,
+         b3_services = name == "b3_services" ? value : values.b3_services,
+         b3_automobile = name == "b3_automobile" ? value : values.b3_automobile;
+      const total_expenses = b3_food + b3_transport + b3_living_place + b3_services + b3_automobile;
+      setFieldValue("total_expenses", total_expenses);
+   };
+
    useEffect(() => {
-      console.log("formData", formData);
-      // console.log("monthlyIncome", monthlyIncome);
       if (formData.id < 1) {
          console.log("folio de params?", folio);
          console.log("pagina de params?", pagina);
          if (folio) {
-            getRequestBecasByFolio(folio);
-            console.log("holaaaaa familia");
-            console.log("formData", formData);
+            const btnModify = document.getElementById("btnModify");
+            if (btnModify != null) btnModify.click();
          }
          getDisabilitiesSelectIndex();
          getSchoolsSelectIndex();
@@ -845,7 +911,7 @@ const RequestBecaView = () => {
                                              </>
                                           )}
                                        </Grid>
-                                       <ButtonsBeforeOrNext isSubmitting={isSubmitting} />
+                                       <ButtonsBeforeOrNext isSubmitting={isSubmitting} setValues={setValues} />
                                     </Box>
                                  )}
                               </Formik>
@@ -1022,7 +1088,7 @@ const RequestBecaView = () => {
                                     Registrar o Guardar
                                  </LoadingButton> */}
                                        </Grid>
-                                       <ButtonsBeforeOrNext isSubmitting={isSubmitting} />
+                                       <ButtonsBeforeOrNext isSubmitting={isSubmitting} setValues={setValues} />
                                     </Box>
                                  )}
                               </Formik>
@@ -1115,7 +1181,7 @@ const RequestBecaView = () => {
                                              />
                                           </Grid>
                                        </Grid>
-                                       <ButtonsBeforeOrNext isSubmitting={isSubmitting} />
+                                       <ButtonsBeforeOrNext isSubmitting={isSubmitting} setValues={setValues} />
                                     </Box>
                                  )}
                               </Formik>
@@ -1175,13 +1241,13 @@ const RequestBecaView = () => {
                                           </Grid>
                                        </Grid>
 
-                                       <ButtonsBeforeOrNext isSubmitting={isSubmitting} />
+                                       <ButtonsBeforeOrNext isSubmitting={isSubmitting} setValues={setValues} />
                                     </Box>
                                  )}
                               </Formik>
                            )}
                            {activeStep + 1 == 5 && (
-                              <Formik initialValues={formData} validationSchema={{}} onSubmit={{}}>
+                              <Formik initialValues={formData} /* validationSchema={validationSchemas(activeStep + 1)} */ onSubmit={onSubmit5}>
                                  {({ errors, handleBlur, handleChange, handleSubmit, isSubmitting, touched, values, resetForm, setFieldValue, setValues }) => (
                                     <Box
                                        sx={{ height: "100%", display: "flex", flexDirection: "column", justifyContent: "space-between" }}
@@ -1202,67 +1268,76 @@ const RequestBecaView = () => {
                                              {/* Alimentación */}
                                              <Grid xs={12} md={12} sx={{ mb: 3 }}>
                                                 <InputComponentv2
-                                                   idName="food"
+                                                   idName="b3_food"
                                                    label="Alimentación (despensa) * $"
                                                    type="number"
-                                                   value={values.food}
+                                                   value={values.b3_food}
                                                    placeholder="Ingrese el gasto mensual de alimentos"
                                                    setFieldValue={setFieldValue}
-                                                   onChange={handleChange}
+                                                   onChange={(e) => {
+                                                      handleChange(e);
+                                                      handleChangeTotal(e, values, setFieldValue);
+                                                   }}
                                                    onBlur={handleBlur}
                                                    inputProps={{ step: 0.01, min: 0, max: 100000 }}
-                                                   disabled={values.id == 0 ? false : true}
-                                                   error={errors.food}
-                                                   touched={touched.food}
-                                                   showErrorInput={showErrorInput}
-                                                   step={4}
+                                                   // disabled={values.id == 0 ? false : true}
+                                                   error={errors.b3_food}
+                                                   touched={touched.b3_food}
+                                                   step={5}
+                                                   setStepFailed={setStepFailed}
                                                    size="normal"
-                                                   // error={errors.food && touched.food}
-                                                   // helperText={errors.food && touched.food && showErrorInput(4, errors.food)}
+                                                   // error={errors.b3_food && touched.b3_food}
+                                                   // helperText={errors.b3_food && touched.b3_food && showErrorInput(4, errors.b3_food)}
                                                 />
                                              </Grid>
                                              {/* Transporte */}
                                              <Grid xs={12} md={12} sx={{ mb: 3 }}>
                                                 <InputComponentv2
-                                                   idName="transport"
+                                                   idName="b3_transport"
                                                    label="Transporte * $"
                                                    type="number"
-                                                   value={values.transport}
-                                                   placeholder="Ingrese el gasto mensual de transporte"
+                                                   value={values.b3_transport}
+                                                   placeholder="Ingrese el gasto mensual de b3_transporte"
                                                    setFieldValue={setFieldValue}
-                                                   onChange={handleChange}
+                                                   onChange={(e) => {
+                                                      handleChange(e);
+                                                      handleChangeTotal(e, values, setFieldValue);
+                                                   }}
                                                    onBlur={handleBlur}
                                                    inputProps={{ step: 0.01, min: 0, max: 100000 }}
-                                                   disabled={values.id == 0 ? false : true}
-                                                   error={errors.transport}
-                                                   touched={touched.transport}
-                                                   showErrorInput={showErrorInput}
-                                                   step={4}
+                                                   // disabled={values.id == 0 ? false : true}
+                                                   error={errors.b3_transport}
+                                                   touched={touched.b3_transport}
+                                                   setStepFailed={setStepFailed}
+                                                   step={5}
                                                    size="normal"
-                                                   // error={errors.transport && touched.transport}
-                                                   // helperText={errors.transport && touched.transport && showErrorInput(4, errors.transport)}
+                                                   // error={errors.b3_transport && touched.b3_transport}
+                                                   // helperText={errors.b3_transport && touched.b3_transport && showErrorInput(4, errors.b3_transport)}
                                                 />
                                              </Grid>
                                              {/* Vivienda */}
                                              <Grid xs={12} md={12} sx={{ mb: 3 }}>
                                                 <InputComponentv2
-                                                   idName="living_place"
+                                                   idName="b3_living_place"
                                                    label="Vivienda (renta, infonavit) * $"
                                                    type="number"
-                                                   value={values.living_place}
+                                                   value={values.b3_living_place}
                                                    placeholder="Ingrese el gasto mensual en pago de vivienda"
                                                    setFieldValue={setFieldValue}
-                                                   onChange={handleChange}
+                                                   onChange={(e) => {
+                                                      handleChange(e);
+                                                      handleChangeTotal(e, values, setFieldValue);
+                                                   }}
                                                    onBlur={handleBlur}
                                                    inputProps={{ step: 0.01, min: 0, max: 100000 }}
-                                                   disabled={values.id == 0 ? false : true}
-                                                   error={errors.living_place}
-                                                   touched={touched.living_place}
-                                                   showErrorInput={showErrorInput}
-                                                   step={4}
+                                                   // disabled={values.id == 0 ? false : true}
+                                                   error={errors.b3_living_place}
+                                                   touched={touched.b3_living_place}
+                                                   setStepFailed={setStepFailed}
+                                                   step={5}
                                                    size="normal"
-                                                   // error={errors.living_place && touched.living_place}
-                                                   // helperText={errors.living_place && touched.living_place && showErrorInput(4, errors.living_place)}
+                                                   // error={errors.b3_living_place && touched.b3_living_place}
+                                                   // helperText={errors.b3_living_place && touched.b3_living_place && showErrorInput(4, errors.b3_living_place)}
                                                 />
                                              </Grid>
                                           </Grid>
@@ -1270,47 +1345,51 @@ const RequestBecaView = () => {
                                              {/* Servicios */}
                                              <Grid xs={12} md={12} sx={{ mb: 3 }}>
                                                 <InputComponentv2
-                                                   idName="services"
+                                                   idName="b3_services"
                                                    label="Servicios (agua y luz) * $"
                                                    type="number"
-                                                   value={values.services}
+                                                   value={values.b3_services}
                                                    placeholder="Ingrese el gasto mensual de alimentos"
                                                    setFieldValue={setFieldValue}
-                                                   onChange={handleChange}
+                                                   onChange={(e) => {
+                                                      handleChange(e);
+                                                      handleChangeTotal(e, values, setFieldValue);
+                                                   }}
                                                    onBlur={handleBlur}
                                                    inputProps={{ step: 0.01, min: 0, max: 100000 }}
-                                                   disabled={values.id == 0 ? false : true}
-                                                   error={errors.services}
-                                                   touched={touched.services}
-                                                   showErrorInput={showErrorInput}
-                                                   step={4}
+                                                   // disabled={values.id == 0 ? false : true}
+                                                   error={errors.b3_services}
+                                                   touched={touched.b3_services}
+                                                   setStepFailed={setStepFailed}
+                                                   step={5}
                                                    size="normal"
-                                                   // error={errors.services && touched.services}
-                                                   // helperText={errors.services && touched.services && showErrorInput(4, errors.services)}
+                                                   // error={errors.b3_services && touched.b3_services}
+                                                   // helperText={errors.b3_services && touched.b3_services && showErrorInput(4, errors.b3_services)}
                                                 />
                                              </Grid>
                                              {/* Automovil */}
                                              <Grid xs={12} md={12} sx={{ mb: 3 }}>
                                                 <InputComponentv2
-                                                   id="automobile"
-                                                   name="automobile"
+                                                   idName="b3_automobile"
                                                    label="Automóvil * $"
                                                    type="number"
-                                                   value={values.automobile}
-                                                   placeholder="Ingrese el gasto mensual en su automóvi"
+                                                   value={values.b3_automobile}
+                                                   placeholder="Ingrese el gasto mensual de su automóvi"
                                                    setFieldValue={setFieldValue}
-                                                   onChange={handleChange}
+                                                   onChange={(e) => {
+                                                      handleChange(e);
+                                                      handleChangeTotal(e, values, setFieldValue);
+                                                   }}
                                                    onBlur={handleBlur}
-                                                   fullWidth
                                                    inputProps={{ step: 0.01, min: 0, max: 100000 }}
-                                                   disabled={values.id == 0 ? false : true}
-                                                   error={errors.automobile}
-                                                   touched={touched.automobile}
-                                                   showErrorInput={showErrorInput}
-                                                   step={4}
+                                                   // disabled={values.id == 0 ? false : true}
+                                                   error={errors.b3_automobile}
+                                                   touched={touched.b3_automobile}
+                                                   setStepFailed={setStepFailed}
+                                                   step={5}
                                                    size="normal"
-                                                   // error={errors.automobile && touched.automobile}
-                                                   // helperText={errors.automobile && touched.automobile && showErrorInput(4, errors.automobile)}
+                                                   // error={errors.b3_automobile && touched.b3_automobile}
+                                                   // helperText={errors.b3_automobile && touched.b3_automobile && showErrorInput(4, errors.b3_automobile)}
                                                 />
                                              </Grid>
                                              {/* Gastos Extras */}
@@ -1331,30 +1410,15 @@ const RequestBecaView = () => {
                                                 error={errors.total_expenses}
                                                 touched={touched.total_expenses}
                                                 disabled={true}
-                                                showErrorInput={showErrorInput}
-                                                step={4}
+                                                setStepFailed={setStepFailed}
+                                                step={5}
                                                 size="normal"
                                                 inputProps={{ step: 0.01, min: 0, max: 100000 }}
                                              />
-                                             {/* <TextField
-                                          id="total_expenses"
-                                          name="total_expenses"
-                                          label="TOTAL DE EGRESOS *"
-                                          type="number"
-                                          value={values.total_expenses}
-                                          placeholder="00.00"
-                                          onChange={handleChange}
-                                          onBlur={handleBlur}
-                                          fullWidth
-                                          inputProps={{ step: 0.01, min: 0, max: 100000 }}
-                                          disabled={true}
-                                          error={errors.total_expenses && touched.total_expenses}
-                                          helperText={errors.total_expenses && touched.total_expenses && showErrorInput(4, errors.total_expenses)}
-                                       /> */}
                                           </Grid>
                                        </Grid>
 
-                                       <ButtonsBeforeOrNext isSubmitting={isSubmitting} />
+                                       <ButtonsBeforeOrNext isSubmitting={isSubmitting} setValues={setValues} />
                                     </Box>
                                  )}
                               </Formik>
@@ -1477,7 +1541,7 @@ const RequestBecaView = () => {
                                           </Grid>
                                        </Grid>
 
-                                       <ButtonsBeforeOrNext isSubmitting={isSubmitting} />
+                                       <ButtonsBeforeOrNext isSubmitting={isSubmitting} setValues={setValues} />
                                     </Box>
                                  )}
                               </Formik>
@@ -1525,8 +1589,8 @@ const RequestBecaView = () => {
                                                                disabled={values.id == 0 ? false : true}
                                                                error={errors.beds}
                                                                touched={touched.beds}
-                                                               showErrorInput={showErrorInput}
-                                                               step={4}
+                                                               setStepFailed={setStepFailed}
+                                                               step={7}
                                                                size="normal"
                                                                // error={errors.beds && touched.beds}
                                                                // helperText={errors.beds && touched.beds && showErrorInput(4, errors.beds)}
@@ -1547,8 +1611,8 @@ const RequestBecaView = () => {
                                                                disabled={values.id == 0 ? false : true}
                                                                error={errors.washing_machines}
                                                                touched={touched.washing_machines}
-                                                               showErrorInput={showErrorInput}
-                                                               step={4}
+                                                               setStepFailed={setStepFailed}
+                                                               step={7}
                                                                size="normal"
                                                             />
                                                          </Grid>
@@ -1567,8 +1631,8 @@ const RequestBecaView = () => {
                                                                disabled={values.id == 0 ? false : true}
                                                                error={errors.boilers}
                                                                touched={touched.boilers}
-                                                               showErrorInput={showErrorInput}
-                                                               step={4}
+                                                               setStepFailed={setStepFailed}
+                                                               step={7}
                                                                size="normal"
                                                             />
                                                          </Grid>
@@ -1587,8 +1651,8 @@ const RequestBecaView = () => {
                                                                disabled={values.id == 0 ? false : true}
                                                                error={errors.tvs}
                                                                touched={touched.tvs}
-                                                               showErrorInput={showErrorInput}
-                                                               step={4}
+                                                               setStepFailed={setStepFailed}
+                                                               step={7}
                                                                size="normal"
                                                             />
                                                          </Grid>
@@ -1607,8 +1671,8 @@ const RequestBecaView = () => {
                                                                disabled={values.id == 0 ? false : true}
                                                                error={errors.pcs}
                                                                touched={touched.pcs}
-                                                               showErrorInput={showErrorInput}
-                                                               step={4}
+                                                               setStepFailed={setStepFailed}
+                                                               step={7}
                                                                size="normal"
                                                             />
                                                          </Grid>
@@ -1629,8 +1693,8 @@ const RequestBecaView = () => {
                                                                disabled={values.id == 0 ? false : true}
                                                                error={errors.phones}
                                                                touched={touched.phones}
-                                                               showErrorInput={showErrorInput}
-                                                               step={4}
+                                                               setStepFailed={setStepFailed}
+                                                               step={7}
                                                                size="normal"
                                                             />
                                                          </Grid>
@@ -1649,8 +1713,8 @@ const RequestBecaView = () => {
                                                                disabled={values.id == 0 ? false : true}
                                                                error={errors.music_player}
                                                                touched={touched.music_player}
-                                                               showErrorInput={showErrorInput}
-                                                               step={4}
+                                                               setStepFailed={setStepFailed}
+                                                               step={7}
                                                                size="normal"
                                                             />
                                                          </Grid>
@@ -1669,8 +1733,8 @@ const RequestBecaView = () => {
                                                                disabled={values.id == 0 ? false : true}
                                                                error={errors.stoves}
                                                                touched={touched.stoves}
-                                                               showErrorInput={showErrorInput}
-                                                               step={4}
+                                                               setStepFailed={setStepFailed}
+                                                               step={7}
                                                                size="normal"
                                                             />
                                                          </Grid>
@@ -1689,8 +1753,8 @@ const RequestBecaView = () => {
                                                                disabled={values.id == 0 ? false : true}
                                                                error={errors.refrigerators}
                                                                touched={touched.refrigerators}
-                                                               showErrorInput={showErrorInput}
-                                                               step={4}
+                                                               setStepFailed={setStepFailed}
+                                                               step={7}
                                                                size="normal"
                                                             />
                                                          </Grid>
@@ -1727,7 +1791,7 @@ const RequestBecaView = () => {
                                                                touched={touched.drinking_water}
                                                             />
                                                             {
-                                                               touched.drinking_water && errors.drinking_water && showErrorInput(4, errors.drinking_water)
+                                                               touched.drinking_water && errors.drinking_water && showErrorInput(7, errors.drinking_water)
                                                                // <FormHelperText error id="ht-drinking_water">
                                                                //    {errors.drinking_water}
                                                                // </FormHelperText>
@@ -1746,7 +1810,7 @@ const RequestBecaView = () => {
                                                                touched={touched.electric_light}
                                                             />
                                                             {
-                                                               touched.electric_light && errors.electric_light && showErrorInput(4, errors.electric_light)
+                                                               touched.electric_light && errors.electric_light && showErrorInput(7, errors.electric_light)
                                                                // <FormHelperText error id="ht-electric_light">
                                                                //    {errors.electric_light}
                                                                // </FormHelperText>
@@ -1765,7 +1829,7 @@ const RequestBecaView = () => {
                                                                touched={touched.sewer_system}
                                                             />
                                                             {
-                                                               touched.sewer_system && errors.sewer_system && showErrorInput(4, errors.sewer_system)
+                                                               touched.sewer_system && errors.sewer_system && showErrorInput(7, errors.sewer_system)
                                                                // <FormHelperText error id="ht-sewer_system">
                                                                //    {errors.sewer_system}
                                                                // </FormHelperText>
@@ -1784,7 +1848,7 @@ const RequestBecaView = () => {
                                                                touched={touched.pavement}
                                                             />
                                                             {
-                                                               touched.pavement && errors.pavement && showErrorInput(4, errors.pavement)
+                                                               touched.pavement && errors.pavement && showErrorInput(7, errors.pavement)
                                                                // <FormHelperText error id="ht-pavement">
                                                                //    {errors.pavement}
                                                                // </FormHelperText>
@@ -1807,7 +1871,7 @@ const RequestBecaView = () => {
                                                                touched={touched.automobile}
                                                             />
                                                             {
-                                                               touched.automobile && errors.automobile && showErrorInput(4, errors.automobile)
+                                                               touched.automobile && errors.automobile && showErrorInput(7, errors.automobile)
                                                                // <FormHelperText error id="ht-automobile">
                                                                //    {errors.automobile}
                                                                // </FormHelperText>
@@ -1826,7 +1890,7 @@ const RequestBecaView = () => {
                                                                touched={touched.phone_line}
                                                             />
                                                             {
-                                                               touched.phone_line && errors.phone_line && showErrorInput(4, errors.phone_line)
+                                                               touched.phone_line && errors.phone_line && showErrorInput(7, errors.phone_line)
                                                                // <FormHelperText error id="ht-phone_line">
                                                                //    {errors.phone_line}
                                                                // </FormHelperText>
@@ -1845,7 +1909,7 @@ const RequestBecaView = () => {
                                                                touched={touched.internet}
                                                             />
                                                             {
-                                                               touched.internet && errors.internet && showErrorInput(4, errors.internet)
+                                                               touched.internet && errors.internet && showErrorInput(7, errors.internet)
                                                                // <FormHelperText error id="ht-internet">
                                                                //    {errors.internet}
                                                                // </FormHelperText>
@@ -1858,7 +1922,7 @@ const RequestBecaView = () => {
                                           </Grid>
                                        </Grid>
 
-                                       <ButtonsBeforeOrNext isSubmitting={isSubmitting} />
+                                       <ButtonsBeforeOrNext isSubmitting={isSubmitting} setValues={setValues} />
                                     </Box>
                                  )}
                               </Formik>
@@ -1903,7 +1967,7 @@ const RequestBecaView = () => {
                                                             sx={{ mr: 10 }}
                                                          />
                                                          {
-                                                            touched.beca_transport && errors.beca_transport && showErrorInput(4, errors.beca_transport)
+                                                            touched.beca_transport && errors.beca_transport && showErrorInput(8, errors.beca_transport)
                                                             // <FormHelperText error id="ht-beca_transport">
                                                             //    {errors.beca_transport}
                                                             // </FormHelperText>
@@ -1923,7 +1987,7 @@ const RequestBecaView = () => {
                                                             sx={{ mr: 10 }}
                                                          />
                                                          {
-                                                            touched.beca_benito_juarez && errors.beca_benito_juarez && showErrorInput(4, errors.beca_benito_juarez)
+                                                            touched.beca_benito_juarez && errors.beca_benito_juarez && showErrorInput(8, errors.beca_benito_juarez)
                                                             // <FormHelperText error id="ht-beca_benito_juarez">
                                                             //    {errors.beca_benito_juarez}
                                                             // </FormHelperText>
@@ -1943,7 +2007,7 @@ const RequestBecaView = () => {
                                                             sx={{ mr: 10 }}
                                                          />
                                                          {
-                                                            touched.other && errors.other && showErrorInput(4, errors.other)
+                                                            touched.other && errors.other && showErrorInput(8, errors.other)
                                                             // <FormHelperText error id="ht-other">
                                                             //    {errors.other}
                                                             // </FormHelperText>
@@ -1962,7 +2026,7 @@ const RequestBecaView = () => {
                                                             touched={touched.beca_jovenes}
                                                          />
                                                          {
-                                                            touched.beca_jovenes && errors.beca_jovenes && showErrorInput(4, errors.beca_jovenes)
+                                                            touched.beca_jovenes && errors.beca_jovenes && showErrorInput(8, errors.beca_jovenes)
                                                             // <FormHelperText error id="ht-beca_jovenes">
                                                             //    {errors.beca_jovenes}
                                                             // </FormHelperText>
@@ -1974,7 +2038,7 @@ const RequestBecaView = () => {
                                           </Grid>
                                        </Grid>
 
-                                       <ButtonsBeforeOrNext isSubmitting={isSubmitting} />
+                                       <ButtonsBeforeOrNext isSubmitting={isSubmitting} setValues={setValues} />
                                     </Box>
                                  )}
                               </Formik>

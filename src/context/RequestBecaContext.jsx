@@ -47,13 +47,30 @@ const formDataInitialState = {
    extra_income: "",
    monthly_income: "",
 
-   total_expenses: "",
+   total_expenses: 0,
    under_protest: "",
 
    socioeconomic_study: "",
    status: "",
-   end_date: ""
+   end_date: "",
+   finished: false, //al concluir la pagina 4 que son los Familiares Tabla B2
+
    // # id, folio, user_id, tutor_data_id, student_data_id, school_id, grade, average, extra_income, monthly_income, total_expenses, under_protest, comments, socioeconomic_study, status, end_date, active, created_at,
+
+   // TABLE -> beca_3_economic_data
+   b3_food: "",
+   b3_transport: "",
+   b3_living_place: "",
+   b3_services: "",
+   b3_automobile: "",
+   b3_finished: false,
+
+   // TABLE -> beca_4_house_data
+   b4_house_is: "",
+   b4_roof_material: "",
+   b4_floor_material: "",
+   b4_score: "",
+   b4_finished: false
 };
 
 // const formDataInitialState = {
@@ -145,7 +162,7 @@ export default function RequestBecaContextProvider({ children }) {
    const saveBeca = async (folio, page, beca) => {
       try {
          let res = CorrectRes;
-         const axiosData = await Axios.put(`/becas/folio/${folio}/page/${page}/saveBeca`, beca);
+         const axiosData = await Axios.post(`/becas/folio/${folio}/page/${page}/saveBeca`, beca);
          res = axiosData.data.data;
          // setRequestBecas(axiosData.data.data.result);
          // console.log("requestBecas", requestBecas);

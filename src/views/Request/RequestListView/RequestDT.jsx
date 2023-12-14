@@ -67,7 +67,13 @@ const RequestBecaDT = () => {
          {obj.active ? <IconCircleCheckFilled style={{ color: "green" }} /> : <IconCircleXFilled style={{ color: "red" }} />}
       </Typography>
    );
+   const CurrentBodyTemplate = (obj) => (
+      <Typography textAlign={"center"}>
+         <b>{obj.current_page}</b>
+      </Typography>
+   );
    const RequestDateBodyTemplate = (obj) => <Typography textAlign={"center"}>{formatDatetime(obj.created_at)}</Typography>;
+   const EndDateBodyTemplate = (obj) => <Typography textAlign={"center"}>{formatDatetime(obj.end_date)}</Typography>;
    //#endregion BODY TEMPLATES
 
    const columns = [
@@ -76,7 +82,9 @@ const RequestBecaDT = () => {
       { field: "student", header: "Alumno", sortable: true, functionEdit: null, body: StudentBodyTemplate },
       { field: "average", header: "Promedio", sortable: true, functionEdit: null, body: AverageBodyTemplate },
       { field: "status", header: "Estatus", sortable: true, functionEdit: null, body: StatusBodyTemplate },
-      { field: "created_at", header: "Fecha de Solicitud", sortable: true, functionEdit: null, body: RequestDateBodyTemplate }
+      { field: "current_page", header: "Página", sortable: true, functionEdit: null, body: CurrentBodyTemplate, filterField: null },
+      { field: "created_at", header: "Fecha de Solicitud", sortable: true, functionEdit: null, body: RequestDateBodyTemplate },
+      { field: "end_date", header: "Fecha de Termino", sortable: true, functionEdit: null, body: EndDateBodyTemplate }
    ];
    auth.role_id === ROLE_SUPER_ADMIN &&
       columns.push(
@@ -174,9 +182,10 @@ const RequestBecaDT = () => {
    const formatData = async () => {
       try {
          // console.log("cargar listado", requestBecas);
-         await requestBecas.map((obj) => {
+         await requestBecas.map((obj, index) => {
             // console.log(obj);
             let register = obj;
+            register.key = index + 1;
             register.created_at = formatDatetime(obj.created_at, true);
             register.actions = <ButtonsAction id={obj.id} name={obj.folio} />;
             data.push(register);

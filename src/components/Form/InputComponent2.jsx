@@ -40,14 +40,27 @@ const InputComponentv2 = ({
    onBlur,
    error,
    touched,
-   showErrorInput = null,
+   setStepFailed,
    step = null,
    disabled,
    size = "small",
    ...prop
 }) => {
-   const errorInput = (step) => {
-      showErrorInput(step, error, true);
+   const showErrorInput = (section, msg, formHelperText = false) => {
+      // Toast.Error(`Error en Sección ${section}: ${msg}`);
+      if (section) {
+         setTimeout(() => {
+            setStepFailed(section - 1);
+         }, 150);
+      }
+      if (formHelperText) {
+         return (
+            <FormHelperText error id={`ht-${idName}`}>
+               {msg}
+            </FormHelperText>
+         );
+      }
+      return msg;
    };
 
    return (
@@ -57,7 +70,7 @@ const InputComponentv2 = ({
                <>
                   <OutlineInputStyle
                      type={type}
-                     value={value}
+                     value={value || ""}
                      placeholder={placeholder}
                      {...field}
                      fullWidth
@@ -84,12 +97,7 @@ const InputComponentv2 = ({
                      sx={{ backgroundColor: gpcDark }}
                      {...prop}
                   />
-                  {touched && error && (
-                     <FormHelperText error id={`ht-${idName}`}>
-                        {showErrorInput ? errorInput : error}
-                        step=null
-                     </FormHelperText>
-                  )}
+                  {touched && error && showErrorInput(step, error, true)}
                </>
             )}
          </Field>
@@ -108,15 +116,28 @@ export const InputComponentv3 = ({
    onBlur,
    error,
    touched,
-   showErrorInput = null,
+   setStepFailed,
    step = null,
    disabled,
    size = "small",
    textAlign = "center",
    ...prop
 }) => {
-   const errorInput = (step) => {
-      showErrorInput(step, error, true);
+   const showErrorInput = (section, msg, formHelperText = false) => {
+      // Toast.Error(`Error en Sección ${section}: ${msg}`);
+      if (section) {
+         setTimeout(() => {
+            setStepFailed(section - 1);
+         }, 150);
+      }
+      if (formHelperText) {
+         return (
+            <FormHelperText error id={`ht-${idName}`}>
+               {msg}
+            </FormHelperText>
+         );
+      }
+      return msg;
    };
 
    return (
@@ -126,7 +147,7 @@ export const InputComponentv3 = ({
             name={idName}
             type={type}
             // fullWidth={fullWidth}
-            value={value}
+            value={value || ""}
             variant="standard"
             placeholder={placeholder || "Ingresa tu info"}
             // inputProps={inputProps}
@@ -138,12 +159,8 @@ export const InputComponentv3 = ({
             sx={{ textAlign: "center" }}
             {...prop}
          />
-         {touched && error && (
-            <FormHelperText error id={`ht-${idName}`}>
-               {showErrorInput ? errorInput : error}
-               step=null
-            </FormHelperText>
-         )}
+         {touched && error && showErrorInput(step, error, true)}
+
          <Typography variant="body1" component="label" htmlFor={idName} ml={1}>
             {label}
          </Typography>
