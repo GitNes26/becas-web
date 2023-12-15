@@ -451,7 +451,7 @@ const RequestBecaView = () => {
    const onSubmit4 = async (values, { setSubmitting, setErrors, resetForm, setValues }) => {
       try {
          // console.log("formData en submit3", formData);
-         values.b3_finished = true;
+         values.finished = true;
          await setFormData({ ...formData, ...values });
          // await setFormData(values);
          // await setValues(formData);
@@ -481,11 +481,79 @@ const RequestBecaView = () => {
    const onSubmit5 = async (values, { setSubmitting, setErrors, resetForm, setValues }) => {
       try {
          // console.log("formData en submit3", formData);
-         values.b4_finished = true;
+         values.b3_finished = true;
          await setFormData({ ...formData, ...values });
          // await setFormData(values);
          // await setValues(formData);
          // return console.log(formData, values);
+         setLoadingAction(true);
+         const axiosResponse = await saveBeca(folio, pagina, values);
+         setSubmitting(false);
+         setLoadingAction(false);
+
+         if (axiosResponse.status_code != 200) return Toast.Error(axiosResponse.alert_text);
+         Toast.Customizable(axiosResponse.alert_text, axiosResponse.alert_icon);
+         // console.log("axiosResponse", axiosResponse);
+         setStepFailed(-1);
+         // resetForm();
+         // resetFormData();
+         handleComplete();
+         // if (!checkAdd) setOpenDialog(false);
+      } catch (error) {
+         console.error(error);
+         setErrors({ submit: error.message });
+         setSubmitting(false);
+      } finally {
+         setSubmitting(false);
+      }
+   };
+
+   const onSubmit6 = async (values, { setSubmitting, setErrors, resetForm, setValues }) => {
+      try {
+         // console.log("formData en submit3", formData);
+         values.b4_finished = true;
+         values.b4_score += Number(values.b4_house_is.split("@")[0]) || 0;
+         values.b4_score += Number(values.b4_roof_material.split("@")[0]) || 0;
+         values.b4_score += Number(values.b4_floor_material.split("@")[0]) || 0;
+         await setFormData({ ...formData, ...values });
+         console.log("formData", values);
+         // return console.log("values", values);
+         // await setFormData(values);
+         // await setValues(formData);
+         setLoadingAction(true);
+         const axiosResponse = await saveBeca(folio, pagina, values);
+         setSubmitting(false);
+         setLoadingAction(false);
+
+         if (axiosResponse.status_code != 200) return Toast.Error(axiosResponse.alert_text);
+         Toast.Customizable(axiosResponse.alert_text, axiosResponse.alert_icon);
+         // console.log("axiosResponse", axiosResponse);
+         setStepFailed(-1);
+         // resetForm();
+         // resetFormData();
+         handleComplete();
+         // if (!checkAdd) setOpenDialog(false);
+      } catch (error) {
+         console.error(error);
+         setErrors({ submit: error.message });
+         setSubmitting(false);
+      } finally {
+         setSubmitting(false);
+      }
+   };
+
+   const onSubmit7 = async (values, { setSubmitting, setErrors, resetForm, setValues }) => {
+      try {
+         // console.log("formData en submit3", formData);
+         values.b5_finished = true;
+         values.b5_score += Number(values.b5_house_is.split("@")[0]) || 0;
+         values.b5_score += Number(values.b5_roof_material.split("@")[0]) || 0;
+         values.b5_score += Number(values.b5_floor_material.split("@")[0]) || 0;
+         await setFormData({ ...formData, ...values });
+         console.log("formData", values);
+         // return console.log("values", values);
+         // await setFormData(values);
+         // await setValues(formData);
          setLoadingAction(true);
          const axiosResponse = await saveBeca(folio, pagina, values);
          setSubmitting(false);
@@ -563,26 +631,36 @@ const RequestBecaView = () => {
                // comments: Yup.string().trim().required("Comentarios requeridos"),
             });
             break;
-         case 4: // PAGINA DATOS DE LA ESCUELA
+         case 4: // PAGINA DATOS FAMILIARES
             validationSchema = Yup.object().shape({
-               // id: 0,
                extra_income: Yup.number("Solo números").min(0, "No puedes poner valores negativos").required("Ingresos Extra requerido"),
                monthly_income: Yup.number("Solo números").min(0, "No puedes poner valores negativos").required("Ingresos Mensuales requerido")
             });
             break;
-         case 5:
+         case 5: // PAGINA DATOS ECONOMICOS
             validationSchema = Yup.object().shape({
-               // id: 0,
-               food: Yup.number("Solo números").min(0, "No puedes poner valores negativos").required("Gastos de Alimentación requerido"),
-               transport: Yup.number("Solo números").min(0, "No puedes poner valores negativos").required("Gastos de Transporte requerido"),
-               living_place: Yup.number("Solo números").min(0, "No puedes poner valores negativos").required("Gastos de Vivienda requerido"),
-               services: Yup.number("Solo números").min(0, "No puedes poner valores negativos").required("Gastos de Servicios requerido"),
-               automobile: Yup.number("Solo números").min(0, "No puedes poner valores negativos").required("Gastos del Automóvil requerido")
+               b3_food: Yup.number("Solo números").min(0, "No puedes poner valores negativos").required("Gastos de Alimentación requerido"),
+               b3_transport: Yup.number("Solo números").min(0, "No puedes poner valores negativos").required("Gastos de Transporte requerido"),
+               b3_living_place: Yup.number("Solo números").min(0, "No puedes poner valores negativos").required("Gastos de Vivienda requerido"),
+               b3_services: Yup.number("Solo números").min(0, "No puedes poner valores negativos").required("Gastos de Servicios requerido"),
+               b3_automobile: Yup.number("Solo números").min(0, "No puedes poner valores negativos").required("Gastos del Automóvil requerido")
             });
             break;
-         case 6:
+         case 6: // PAGINA DATOS DE VIVIENDA
+            validationSchema = Yup.object().shape({
+               b4_house_is: Yup.string().trim().required("Selecciona una opción"),
+               b4_roof_material: Yup.string().trim().required("Selecciona una opción"),
+               b4_floor_material: Yup.string().trim().required("Selecciona una opción")
+            });
             break;
          case 7:
+            validationSchema = Yup.object().shape({
+               b3_food: Yup.number("Solo números").min(0, "No puedes poner valores negativos").required("Gastos de Alimentación requerido"),
+               b3_transport: Yup.number("Solo números").min(0, "No puedes poner valores negativos").required("Gastos de Transporte requerido"),
+               b3_living_place: Yup.number("Solo números").min(0, "No puedes poner valores negativos").required("Gastos de Vivienda requerido"),
+               b3_services: Yup.number("Solo números").min(0, "No puedes poner valores negativos").required("Gastos de Servicios requerido"),
+               b3_automobile: Yup.number("Solo números").min(0, "No puedes poner valores negativos").required("Gastos del Automóvil requerido")
+            });
             break;
          case 8:
             break;
@@ -1424,7 +1502,7 @@ const RequestBecaView = () => {
                               </Formik>
                            )}
                            {activeStep + 1 == 6 && (
-                              <Formik initialValues={formData} validationSchema={{}} onSubmit={{}}>
+                              <Formik initialValues={formData} validationSchema={validationSchemas(activeStep + 1)} onSubmit={onSubmit6}>
                                  {({ errors, handleBlur, handleChange, handleSubmit, isSubmitting, touched, values, resetForm, setFieldValue, setValues }) => (
                                     <Box
                                        sx={{ height: "100%", display: "flex", flexDirection: "column", justifyContent: "space-between" }}
@@ -1436,7 +1514,7 @@ const RequestBecaView = () => {
                                              <ol>
                                                 {/* La casa es */}
                                                 <FormControl fullWidth sx={{ mb: 5 }}>
-                                                   <FormLabel id="house_is-label">
+                                                   <FormLabel id="b4_house_is-label">
                                                       <Typography variant="h4" component={"p"} mb={1}>
                                                          <li>La casa donde vives es:</li>
                                                       </Typography>
@@ -1449,10 +1527,10 @@ const RequestBecaView = () => {
                                              </ToggleButtonGroup> */}
                                                    <RadioGroup
                                                       row
-                                                      aria-labelledby="house_is-label"
-                                                      id="house_is"
-                                                      name="house_is"
-                                                      value={values.house_is}
+                                                      aria-labelledby="b4_house_is-label"
+                                                      id="b4_house_is"
+                                                      name="b4_house_is"
+                                                      value={values.b4_house_is}
                                                       onChange={handleChange}
                                                       onBlur={handleBlur}
                                                    >
@@ -1461,15 +1539,16 @@ const RequestBecaView = () => {
                                                       <FormControlLabel sx={{ mr: 5 }} value="3@Alquilada" control={<Radio />} label="Alquilada" />
                                                       <FormControlLabel sx={{ mr: 5 }} value="4@Otra" control={<Radio />} label="Otra" />
                                                    </RadioGroup>
-                                                   {touched.house_is && errors.house_is && (
-                                                      <FormHelperText error id="ht-house_is">
-                                                         {errors.house_is}
+                                                   {touched.b4_house_is && errors.b4_house_is && (
+                                                      <FormHelperText error id="ht-b4_house_is">
+                                                         {errors.b4_house_is}
                                                       </FormHelperText>
                                                    )}
                                                 </FormControl>
+
                                                 {/* Material del techo */}
                                                 <FormControl fullWidth sx={{ mb: 5 }}>
-                                                   <FormLabel id="roof_material-label">
+                                                   <FormLabel id="b4_roof_material-label">
                                                       <Typography variant="h4" component={"p"} mb={1}>
                                                          <li>Material del techo de la vivienda (si está hecho de más de un matgerial, marca el que predomine):</li>
                                                       </Typography>
@@ -1480,10 +1559,10 @@ const RequestBecaView = () => {
                                              </ToggleButtonGroup> */}
                                                    <RadioGroup
                                                       row
-                                                      aria-labelledby="roof_material-label"
-                                                      id="roof_material"
-                                                      name="roof_material"
-                                                      value={values.roof_material}
+                                                      aria-labelledby="b4_roof_material-label"
+                                                      id="b4_roof_material"
+                                                      name="b4_roof_material"
+                                                      value={values.b4_roof_material}
                                                       onChange={handleChange}
                                                       onBlur={handleBlur}
                                                    >
@@ -1495,15 +1574,16 @@ const RequestBecaView = () => {
                                                       />
                                                       <FormControlLabel sx={{ mr: 5 }} value="2@Concreto" control={<Radio />} label="Firme de concreto" />
                                                    </RadioGroup>
-                                                   {touched.roof_material && errors.roof_material && (
-                                                      <FormHelperText error id="ht-roof_material">
-                                                         {errors.roof_material}
+                                                   {touched.b4_roof_material && errors.b4_roof_material && (
+                                                      <FormHelperText error id="ht-b4_roof_material">
+                                                         {errors.b4_roof_material}
                                                       </FormHelperText>
                                                    )}
                                                 </FormControl>
+
                                                 {/* Material del techo */}
                                                 <FormControl fullWidth sx={{ mb: 5 }}>
-                                                   <FormLabel id="roof_material-label">
+                                                   <FormLabel id="b4_floor_material-label">
                                                       <Typography variant="h4" component={"p"} mb={1}>
                                                          <li>Material del piso de la vivienda (si está hecho de más de un matgerial, marca el que predomine):</li>
                                                       </Typography>
@@ -1515,10 +1595,10 @@ const RequestBecaView = () => {
                                              </ToggleButtonGroup> */}
                                                    <RadioGroup
                                                       row
-                                                      aria-labelledby="roof_material-label"
-                                                      id="roof_material"
-                                                      name="roof_material"
-                                                      value={values.roof_material}
+                                                      aria-labelledby="b4_floor_material-label"
+                                                      id="b4_floor_material"
+                                                      name="b4_floor_material"
+                                                      value={values.b4_floor_material}
                                                       onChange={handleChange}
                                                       onBlur={handleBlur}
                                                    >
@@ -1531,9 +1611,9 @@ const RequestBecaView = () => {
                                                          label="Mosaico, loseta, madera laminada"
                                                       />
                                                    </RadioGroup>
-                                                   {touched.roof_material && errors.roof_material && (
-                                                      <FormHelperText error id="ht-roof_material">
-                                                         {errors.roof_material}
+                                                   {touched.b4_floor_material && errors.b4_floor_material && (
+                                                      <FormHelperText error id="ht-b4_floor_material">
+                                                         {errors.b4_floor_material}
                                                       </FormHelperText>
                                                    )}
                                                 </FormControl>
