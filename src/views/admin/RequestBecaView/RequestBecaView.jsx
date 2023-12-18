@@ -655,11 +655,22 @@ const RequestBecaView = () => {
             break;
          case 7:
             validationSchema = Yup.object().shape({
-               b3_food: Yup.number("Solo números").min(0, "No puedes poner valores negativos").required("Gastos de Alimentación requerido"),
-               b3_transport: Yup.number("Solo números").min(0, "No puedes poner valores negativos").required("Gastos de Transporte requerido"),
-               b3_living_place: Yup.number("Solo números").min(0, "No puedes poner valores negativos").required("Gastos de Vivienda requerido"),
-               b3_services: Yup.number("Solo números").min(0, "No puedes poner valores negativos").required("Gastos de Servicios requerido"),
-               b3_automobile: Yup.number("Solo números").min(0, "No puedes poner valores negativos").required("Gastos del Automóvil requerido")
+               b5_beds: Yup.number("Solo números").min(0, "No puedes poner valores negativos").required("Cantidad de Camas requerido"),
+               b5_washing_machines: Yup.number("Solo números").min(0, "No puedes poner valores negativos").required("Cantidad de Lavadoras requerido"),
+               b5_boilers: Yup.number("Solo números").min(0, "No puedes poner valores negativos").required("Cantidad de Boilers requerido"),
+               b5_tvs: Yup.number("Solo números").min(0, "No puedes poner valores negativos").required("Cantidad de TVs requerido"),
+               b5_pcs: Yup.number("Solo números").min(0, "No puedes poner valores negativos").required("Cantidad de Computadoras requerido"),
+               b5_phones: Yup.number("Solo números").min(0, "No puedes poner valores negativos").required("Cantidad de Teléfonos y Celuláres requerido"),
+               b5_music_player: Yup.number("Solo números").min(0, "No puedes poner valores negativos").required("Cantidad de Reproductores de Música requerido"),
+               b5_stoves: Yup.number("Solo números").min(0, "No puedes poner valores negativos").required("Cantidad de Estufas requerido"),
+               b5_refrigerators: Yup.number("Solo números").min(0, "No puedes poner valores negativos").required("Canitdad de Refrigeradores requerido")
+               // b5_drinking_water: Yup.number("Solo números").min(0, "No puedes poner valores negativos").required("Gastos del Automóvil requerido"),
+               // b5_electric_light: Yup.number("Solo números").min(0, "No puedes poner valores negativos").required("Gastos del Automóvil requerido"),
+               // b5_sewer_system: Yup.number("Solo números").min(0, "No puedes poner valores negativos").required("Gastos del Automóvil requerido"),
+               // b5_pavement: Yup.number("Solo números").min(0, "No puedes poner valores negativos").required("Gastos del Automóvil requerido"),
+               // b5_automobile: Yup.number("Solo números").min(0, "No puedes poner valores negativos").required("Gastos del Automóvil requerido"),
+               // b5_phone_line: Yup.number("Solo números").min(0, "No puedes poner valores negativos").required("Gastos del Automóvil requerido"),
+               // b5_internet: Yup.number("Solo números").min(0, "No puedes poner valores negativos").required("Gastos del Automóvil requerido")
             });
             break;
          case 8:
@@ -1627,7 +1638,7 @@ const RequestBecaView = () => {
                               </Formik>
                            )}
                            {activeStep + 1 == 7 && (
-                              <Formik initialValues={formData} validationSchema={{}} onSubmit={{}}>
+                              <Formik initialValues={formData} validationSchema={validationSchemas(activeStep + 1)} onSubmit={onSubmit7}>
                                  {({ errors, handleBlur, handleChange, handleSubmit, isSubmitting, touched, values, resetForm, setFieldValue, setValues }) => (
                                     <Box
                                        sx={{ height: "100%", display: "flex", flexDirection: "column", justifyContent: "space-between" }}
@@ -1657,40 +1668,40 @@ const RequestBecaView = () => {
                                                          {/* Camas */}
                                                          <Grid xs={12} md={6} sx={{ mb: 1 }}>
                                                             <InputComponentv3
-                                                               idName="beds"
+                                                               idName="b5_beds"
                                                                label="Camas"
                                                                type="number"
-                                                               value={values.beds}
+                                                               value={values.b5_beds}
                                                                placeholder="0"
                                                                setFieldValue={setFieldValue}
                                                                onChange={handleChange}
                                                                onBlur={handleBlur}
                                                                inputProps={{ min: 0, max: 100000 }}
-                                                               disabled={values.id == 0 ? false : true}
-                                                               error={errors.beds}
-                                                               touched={touched.beds}
+                                                               // disabled={values.id == 0 ? false : true}
+                                                               error={errors.b5_beds}
+                                                               touched={touched.b5_beds}
                                                                setStepFailed={setStepFailed}
                                                                step={7}
                                                                size="normal"
-                                                               // error={errors.beds && touched.beds}
-                                                               // helperText={errors.beds && touched.beds && showErrorInput(4, errors.beds)}
+                                                               // error={errors.b5_beds && touched.b5_beds}
+                                                               // helperText={errors.b5_beds && touched.b5_beds && showErrorInput(4, errors.b5_beds)}
                                                             />
                                                          </Grid>
                                                          {/* Lavadoras */}
                                                          <Grid xs={12} md={6} sx={{ mb: 1 }}>
                                                             <InputComponentv3
-                                                               idName="washing_machines"
+                                                               idName="b5_washing_machines"
                                                                label="Lavadoras"
                                                                type="number"
-                                                               value={values.washing_machines}
+                                                               value={values.b5_washing_machines}
                                                                placeholder="0"
                                                                setFieldValue={setFieldValue}
                                                                onChange={handleChange}
                                                                onBlur={handleBlur}
                                                                inputProps={{ min: 0, max: 100000 }}
-                                                               disabled={values.id == 0 ? false : true}
-                                                               error={errors.washing_machines}
-                                                               touched={touched.washing_machines}
+                                                               // disabled={values.id == 0 ? false : true}
+                                                               error={errors.b5_washing_machines}
+                                                               touched={touched.b5_washing_machines}
                                                                setStepFailed={setStepFailed}
                                                                step={7}
                                                                size="normal"
@@ -1699,18 +1710,18 @@ const RequestBecaView = () => {
                                                          {/* Calentador de agua (boiler) */}
                                                          <Grid xs={12} md={6} sx={{ mb: 1 }}>
                                                             <InputComponentv3
-                                                               idName="boilers"
+                                                               idName="b5_boilers"
                                                                label="Calentador de agua (boiler)"
                                                                type="number"
-                                                               value={values.boilers}
+                                                               value={values.b5_boilers}
                                                                placeholder="0"
                                                                setFieldValue={setFieldValue}
                                                                onChange={handleChange}
                                                                onBlur={handleBlur}
                                                                inputProps={{ min: 0, max: 100000 }}
-                                                               disabled={values.id == 0 ? false : true}
-                                                               error={errors.boilers}
-                                                               touched={touched.boilers}
+                                                               // disabled={values.id == 0 ? false : true}
+                                                               error={errors.b5_boilers}
+                                                               touched={touched.b5_boilers}
                                                                setStepFailed={setStepFailed}
                                                                step={7}
                                                                size="normal"
@@ -1719,18 +1730,18 @@ const RequestBecaView = () => {
                                                          {/* Televisores */}
                                                          <Grid xs={12} md={6} sx={{ mb: 1 }}>
                                                             <InputComponentv3
-                                                               idName="tvs"
+                                                               idName="b5_tvs"
                                                                label="Televisores"
                                                                type="number"
-                                                               value={values.tvs}
+                                                               value={values.b5_tvs}
                                                                placeholder="0"
                                                                setFieldValue={setFieldValue}
                                                                onChange={handleChange}
                                                                onBlur={handleBlur}
                                                                inputProps={{ min: 0, max: 100000 }}
-                                                               disabled={values.id == 0 ? false : true}
-                                                               error={errors.tvs}
-                                                               touched={touched.tvs}
+                                                               // disabled={values.id == 0 ? false : true}
+                                                               error={errors.b5_tvs}
+                                                               touched={touched.b5_tvs}
                                                                setStepFailed={setStepFailed}
                                                                step={7}
                                                                size="normal"
@@ -1739,18 +1750,18 @@ const RequestBecaView = () => {
                                                          {/* Computadoras */}
                                                          <Grid xs={12} md={6} sx={{ mb: 1 }}>
                                                             <InputComponentv3
-                                                               idName="pcs"
+                                                               idName="b5_pcs"
                                                                label="Computadoras"
                                                                type="number"
-                                                               value={values.pcs}
+                                                               value={values.b5_pcs}
                                                                placeholder="0"
                                                                setFieldValue={setFieldValue}
                                                                onChange={handleChange}
                                                                onBlur={handleBlur}
                                                                inputProps={{ min: 0, max: 100000 }}
-                                                               disabled={values.id == 0 ? false : true}
-                                                               error={errors.pcs}
-                                                               touched={touched.pcs}
+                                                               // disabled={values.id == 0 ? false : true}
+                                                               error={errors.b5_pcs}
+                                                               touched={touched.b5_pcs}
                                                                setStepFailed={setStepFailed}
                                                                step={7}
                                                                size="normal"
@@ -1761,18 +1772,18 @@ const RequestBecaView = () => {
                                                          {/* Teléfonos (local o celular) */}
                                                          <Grid xs={12} md={6} sx={{ mb: 1 }}>
                                                             <InputComponentv3
-                                                               idName="phones"
+                                                               idName="b5_phones"
                                                                label="Teléfonos (local o celular)"
                                                                type="number"
-                                                               value={values.phones}
+                                                               value={values.b5_phones}
                                                                placeholder="0"
                                                                setFieldValue={setFieldValue}
                                                                onChange={handleChange}
                                                                onBlur={handleBlur}
                                                                inputProps={{ min: 0, max: 100000 }}
-                                                               disabled={values.id == 0 ? false : true}
-                                                               error={errors.phones}
-                                                               touched={touched.phones}
+                                                               // disabled={values.id == 0 ? false : true}
+                                                               error={errors.b5_phones}
+                                                               touched={touched.b5_phones}
                                                                setStepFailed={setStepFailed}
                                                                step={7}
                                                                size="normal"
@@ -1781,18 +1792,18 @@ const RequestBecaView = () => {
                                                          {/* Reproductores de Música */}
                                                          <Grid xs={12} md={6} sx={{ mb: 1 }}>
                                                             <InputComponentv3
-                                                               idName="music_player"
+                                                               idName="b5_music_player"
                                                                label="Reproductores de Música"
                                                                type="number"
-                                                               value={values.music_player}
+                                                               value={values.b5_music_player}
                                                                placeholder="0"
                                                                setFieldValue={setFieldValue}
                                                                onChange={handleChange}
                                                                onBlur={handleBlur}
                                                                inputProps={{ min: 0, max: 100000 }}
-                                                               disabled={values.id == 0 ? false : true}
-                                                               error={errors.music_player}
-                                                               touched={touched.music_player}
+                                                               // disabled={values.id == 0 ? false : true}
+                                                               error={errors.b5_music_player}
+                                                               touched={touched.b5_music_player}
                                                                setStepFailed={setStepFailed}
                                                                step={7}
                                                                size="normal"
@@ -1801,18 +1812,18 @@ const RequestBecaView = () => {
                                                          {/* Estufas */}
                                                          <Grid xs={12} md={6} sx={{ mb: 1 }}>
                                                             <InputComponentv3
-                                                               idName="stoves"
+                                                               idName="b5_stoves"
                                                                label="Estufas"
                                                                type="number"
-                                                               value={values.stoves}
+                                                               value={values.b5_stoves}
                                                                placeholder="0"
                                                                setFieldValue={setFieldValue}
                                                                onChange={handleChange}
                                                                onBlur={handleBlur}
                                                                inputProps={{ min: 0, max: 100000 }}
-                                                               disabled={values.id == 0 ? false : true}
-                                                               error={errors.stoves}
-                                                               touched={touched.stoves}
+                                                               // disabled={values.id == 0 ? false : true}
+                                                               error={errors.b5_stoves}
+                                                               touched={touched.b5_stoves}
                                                                setStepFailed={setStepFailed}
                                                                step={7}
                                                                size="normal"
@@ -1821,18 +1832,18 @@ const RequestBecaView = () => {
                                                          {/* Refrigeradores */}
                                                          <Grid xs={12} md={6} sx={{ mb: 1 }}>
                                                             <InputComponentv3
-                                                               idName="refrigerators"
+                                                               idName="b5_refrigerators"
                                                                label="Refrigeradores"
                                                                type="number"
-                                                               value={values.refrigerators}
+                                                               value={values.b5_refrigerators}
                                                                placeholder="0"
                                                                setFieldValue={setFieldValue}
                                                                onChange={handleChange}
                                                                onBlur={handleBlur}
                                                                inputProps={{ min: 0, max: 100000 }}
-                                                               disabled={values.id == 0 ? false : true}
-                                                               error={errors.refrigerators}
-                                                               touched={touched.refrigerators}
+                                                               // disabled={values.id == 0 ? false : true}
+                                                               error={errors.b5_refrigerators}
+                                                               touched={touched.b5_refrigerators}
                                                                setStepFailed={setStepFailed}
                                                                step={7}
                                                                size="normal"
@@ -1859,78 +1870,86 @@ const RequestBecaView = () => {
                                                          <FormGroup>
                                                             {/* Agua Potable */}
                                                             <FormControlLabel
-                                                               control={<Checkbox defaultChecked={values.drinking_water} />}
+                                                               control={<Checkbox defaultChecked={values.b5_drinking_water || false} />}
                                                                label="Agua Potable"
-                                                               id="drinking_water"
-                                                               name="drinking_water"
+                                                               id="b5_drinking_water"
+                                                               name="b5_drinking_water"
+                                                               defaultChecked={false}
+                                                               checked={values.b5_electric_light || false}
                                                                value={2}
                                                                onChange={handleChange}
                                                                onBlur={handleBlur}
-                                                               disabled={values.id == 0 ? false : true}
-                                                               error={errors.drinking_water}
-                                                               touched={touched.drinking_water}
+                                                               // disabled={values.id == 0 ? false : true}
+                                                               error={errors.b5_drinking_water}
+                                                               touched={touched.b5_drinking_water}
                                                             />
                                                             {
-                                                               touched.drinking_water && errors.drinking_water && showErrorInput(7, errors.drinking_water)
-                                                               // <FormHelperText error id="ht-drinking_water">
-                                                               //    {errors.drinking_water}
+                                                               touched.b5_drinking_water && errors.b5_drinking_water && showErrorInput(7, errors.b5_drinking_water)
+                                                               // <FormHelperText error id="ht-b5_drinking_water">
+                                                               //    {errors.b5_drinking_water}
                                                                // </FormHelperText>
                                                             }
                                                             {/* Luz Eléctrica */}
                                                             <FormControlLabel
-                                                               control={<Checkbox defaultChecked={values.electric_light} />}
+                                                               control={<Checkbox defaultChecked={values.b5_electric_light || false} />}
                                                                label="Luz Eléctrica"
-                                                               id="electric_light"
-                                                               name="electric_light"
+                                                               id="b5_electric_light"
+                                                               name="b5_electric_light"
+                                                               defaultChecked={false}
+                                                               checked={values.b5_electric_light || false}
                                                                value={2}
                                                                onChange={handleChange}
                                                                onBlur={handleBlur}
-                                                               disabled={values.id == 0 ? false : true}
-                                                               error={errors.electric_light}
-                                                               touched={touched.electric_light}
+                                                               // disabled={values.id == 0 ? false : true}
+                                                               error={errors.b5_electric_light}
+                                                               touched={touched.b5_electric_light}
                                                             />
                                                             {
-                                                               touched.electric_light && errors.electric_light && showErrorInput(7, errors.electric_light)
-                                                               // <FormHelperText error id="ht-electric_light">
-                                                               //    {errors.electric_light}
+                                                               touched.b5_electric_light && errors.b5_electric_light && showErrorInput(7, errors.b5_electric_light)
+                                                               // <FormHelperText error id="ht-b5_electric_light">
+                                                               //    {errors.b5_electric_light}
                                                                // </FormHelperText>
                                                             }
                                                             {/* Drenaje */}
                                                             <FormControlLabel
-                                                               control={<Checkbox defaultChecked={values.sewer_system} />}
+                                                               control={<Checkbox defaultChecked={values.b5_sewer_system || false} />}
                                                                label="Drenaje"
-                                                               id="sewer_system"
-                                                               name="sewer_system"
+                                                               id="b5_sewer_system"
+                                                               name="b5_sewer_system"
+                                                               defaultChecked={false}
+                                                               checked={values.b5_sewer_system || false}
                                                                value={2}
                                                                onChange={handleChange}
                                                                onBlur={handleBlur}
-                                                               disabled={values.id == 0 ? false : true}
-                                                               error={errors.sewer_system}
-                                                               touched={touched.sewer_system}
+                                                               // disabled={values.id == 0 ? false : true}
+                                                               error={errors.b5_sewer_system}
+                                                               touched={touched.b5_sewer_system}
                                                             />
                                                             {
-                                                               touched.sewer_system && errors.sewer_system && showErrorInput(7, errors.sewer_system)
-                                                               // <FormHelperText error id="ht-sewer_system">
-                                                               //    {errors.sewer_system}
+                                                               touched.b5_sewer_system && errors.b5_sewer_system && showErrorInput(7, errors.b5_sewer_system)
+                                                               // <FormHelperText error id="ht-b5_sewer_system">
+                                                               //    {errors.b5_sewer_system}
                                                                // </FormHelperText>
                                                             }
                                                             {/* Pavimento */}
                                                             <FormControlLabel
-                                                               control={<Checkbox defaultChecked={values.pavement} />}
+                                                               control={<Checkbox defaultChecked={values.b5_pavement || false} />}
                                                                label="Pavimento"
-                                                               id="pavement"
-                                                               name="pavement"
+                                                               id="b5_pavement"
+                                                               name="b5_pavement"
+                                                               defaultChecked={false}
+                                                               checked={values.b5_pavement || false}
                                                                value={2}
                                                                onChange={handleChange}
                                                                onBlur={handleBlur}
-                                                               disabled={values.id == 0 ? false : true}
-                                                               error={errors.pavement}
-                                                               touched={touched.pavement}
+                                                               // disabled={values.id == 0 ? false : true}
+                                                               error={errors.b5_pavement}
+                                                               touched={touched.b5_pavement}
                                                             />
                                                             {
-                                                               touched.pavement && errors.pavement && showErrorInput(7, errors.pavement)
-                                                               // <FormHelperText error id="ht-pavement">
-                                                               //    {errors.pavement}
+                                                               touched.b5_pavement && errors.b5_pavement && showErrorInput(7, errors.b5_pavement)
+                                                               // <FormHelperText error id="ht-b5_pavement">
+                                                               //    {errors.b5_pavement}
                                                                // </FormHelperText>
                                                             }
                                                          </FormGroup>
@@ -1939,59 +1958,65 @@ const RequestBecaView = () => {
                                                          <FormGroup>
                                                             {/* Automóvil */}
                                                             <FormControlLabel
-                                                               control={<Checkbox defaultChecked={values.automobile} />}
+                                                               control={<Checkbox defaultChecked={values.b5_automobile || false} />}
                                                                label="Automóvil"
-                                                               id="automobile"
-                                                               name="automobile"
+                                                               id="b5_automobile"
+                                                               name="b5_automobile"
+                                                               defaultChecked={false}
+                                                               checked={values.b5_automobile || false}
                                                                value={2}
                                                                onChange={handleChange}
                                                                onBlur={handleBlur}
-                                                               disabled={values.id == 0 ? false : true}
-                                                               error={errors.automobile}
-                                                               touched={touched.automobile}
+                                                               // disabled={values.id == 0 ? false : true}
+                                                               error={errors.b5_automobile}
+                                                               touched={touched.b5_automobile}
                                                             />
                                                             {
-                                                               touched.automobile && errors.automobile && showErrorInput(7, errors.automobile)
-                                                               // <FormHelperText error id="ht-automobile">
-                                                               //    {errors.automobile}
+                                                               touched.b5_automobile && errors.b5_automobile && showErrorInput(7, errors.b5_automobile)
+                                                               // <FormHelperText error id="ht-b5_automobile">
+                                                               //    {errors.b5_automobile}
                                                                // </FormHelperText>
                                                             }
                                                             {/* Línea Telefónica */}
                                                             <FormControlLabel
-                                                               control={<Checkbox defaultChecked={values.phone_line} />}
+                                                               control={<Checkbox defaultChecked={values.b5_phone_line || false} />}
                                                                label="Línea Telefónica"
-                                                               id="phone_line"
-                                                               name="phone_line"
+                                                               id="b5_phone_line"
+                                                               name="b5_phone_line"
+                                                               defaultChecked={false}
+                                                               checked={values.b5_phone_line || false}
                                                                value={2}
                                                                onChange={handleChange}
                                                                onBlur={handleBlur}
-                                                               disabled={values.id == 0 ? false : true}
-                                                               error={errors.phone_line}
-                                                               touched={touched.phone_line}
+                                                               // disabled={values.id == 0 ? false : true}
+                                                               error={errors.b5_phone_line}
+                                                               touched={touched.b5_phone_line}
                                                             />
                                                             {
-                                                               touched.phone_line && errors.phone_line && showErrorInput(7, errors.phone_line)
-                                                               // <FormHelperText error id="ht-phone_line">
-                                                               //    {errors.phone_line}
+                                                               touched.b5_phone_line && errors.b5_phone_line && showErrorInput(7, errors.b5_phone_line)
+                                                               // <FormHelperText error id="ht-b5_phone_line">
+                                                               //    {errors.b5_phone_line}
                                                                // </FormHelperText>
                                                             }
                                                             {/* Internet */}
                                                             <FormControlLabel
-                                                               control={<Checkbox defaultChecked={values.internet} />}
+                                                               control={<Checkbox defaultChecked={values.b5_internet || false} />}
                                                                label="Internet"
-                                                               id="internet"
-                                                               name="internet"
+                                                               id="b5_internet"
+                                                               name="b5_internet"
+                                                               defaultChecked={false}
+                                                               checked={values.b5_internet || false}
                                                                value={2}
                                                                onChange={handleChange}
                                                                onBlur={handleBlur}
-                                                               disabled={values.id == 0 ? false : true}
-                                                               error={errors.internet}
-                                                               touched={touched.internet}
+                                                               // disabled={values.id == 0 ? false : true}
+                                                               error={errors.b5_internet}
+                                                               touched={touched.b5_internet}
                                                             />
                                                             {
-                                                               touched.internet && errors.internet && showErrorInput(7, errors.internet)
-                                                               // <FormHelperText error id="ht-internet">
-                                                               //    {errors.internet}
+                                                               touched.b5_internet && errors.b5_internet && showErrorInput(7, errors.b5_internet)
+                                                               // <FormHelperText error id="ht-b5_internet">
+                                                               //    {errors.b5_internet}
                                                                // </FormHelperText>
                                                             }
                                                          </FormGroup>
