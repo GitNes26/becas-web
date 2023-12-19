@@ -546,9 +546,29 @@ const RequestBecaView = () => {
       try {
          // console.log("formData en submit3", formData);
          values.b5_finished = true;
-         values.b5_score += Number(values.b5_house_is.split("@")[0]) || 0;
-         values.b5_score += Number(values.b5_roof_material.split("@")[0]) || 0;
-         values.b5_score += Number(values.b5_floor_material.split("@")[0]) || 0;
+         values.b5_score += Number(values.b5_beds * 1) || 0;
+         values.b5_score += Number(values.b5_washing_machines * 1) || 0;
+         values.b5_score += Number(values.b5_tvs * 1) || 0;
+         values.b5_score += Number(values.b5_pcs * 1) || 0;
+         values.b5_score += Number(values.b5_phones * 1) || 0;
+         values.b5_score += Number(values.b5_music_player * 1) || 0;
+         values.b5_score += Number(values.b5_refrigerators * 1) || 0;
+
+         values.b5_drinking_water = values.b5_drinking_water ? true : false || false;
+         values.b5_electric_light = values.b5_electric_light ? true : false || false;
+         values.b5_sewer_system = values.b5_sewer_system ? true : false || false;
+         values.b5_pavement = values.b5_pavement ? true : false || false;
+         values.b5_automobile = values.b5_automobile ? true : false || false;
+         values.b5_phone_line = values.b5_phone_line ? true : false || false;
+         values.b5_internet = values.b5_internet ? true : false || false;
+
+         values.b5_score += Number(values.b5_drinking_water ? 1 : 0) || 0;
+         values.b5_score += Number(values.b5_electric_light ? 1 : 0) || 0;
+         values.b5_score += Number(values.b5_sewer_system ? 1 : 0) || 0;
+         values.b5_score += Number(values.b5_pavement ? 1 : 0) || 0;
+         values.b5_score += Number(values.b5_automobile ? 1 : 0) || 0;
+         values.b5_score += Number(values.b5_phone_line ? 1 : 0) || 0;
+         values.b5_score += Number(values.b5_internet ? 1 : 0) || 0;
          await setFormData({ ...formData, ...values });
          console.log("formData", values);
          // return console.log("values", values);
@@ -1870,155 +1890,93 @@ const RequestBecaView = () => {
                                                          <FormGroup>
                                                             {/* Agua Potable */}
                                                             <FormControlLabel
-                                                               control={<Checkbox defaultChecked={values.b5_drinking_water || false} />}
+                                                               control={<Checkbox checked={values.b5_drinking_water || false} />}
                                                                label="Agua Potable"
                                                                id="b5_drinking_water"
                                                                name="b5_drinking_water"
-                                                               defaultChecked={false}
-                                                               checked={values.b5_electric_light || false}
-                                                               value={2}
+                                                               value={true}
                                                                onChange={handleChange}
                                                                onBlur={handleBlur}
                                                                // disabled={values.id == 0 ? false : true}
-                                                               error={errors.b5_drinking_water}
-                                                               touched={touched.b5_drinking_water}
+                                                               // error={errors.b5_drinking_water}
+                                                               // touched={touched.b5_drinking_water}
                                                             />
-                                                            {
+                                                            {/* {
                                                                touched.b5_drinking_water && errors.b5_drinking_water && showErrorInput(7, errors.b5_drinking_water)
                                                                // <FormHelperText error id="ht-b5_drinking_water">
                                                                //    {errors.b5_drinking_water}
                                                                // </FormHelperText>
-                                                            }
+                                                            } */}
                                                             {/* Luz Eléctrica */}
                                                             <FormControlLabel
-                                                               control={<Checkbox defaultChecked={values.b5_electric_light || false} />}
+                                                               control={<Checkbox checked={values.b5_electric_light || false} />}
                                                                label="Luz Eléctrica"
                                                                id="b5_electric_light"
                                                                name="b5_electric_light"
-                                                               defaultChecked={false}
-                                                               checked={values.b5_electric_light || false}
-                                                               value={2}
+                                                               value={true}
                                                                onChange={handleChange}
                                                                onBlur={handleBlur}
                                                                // disabled={values.id == 0 ? false : true}
-                                                               error={errors.b5_electric_light}
-                                                               touched={touched.b5_electric_light}
                                                             />
-                                                            {
-                                                               touched.b5_electric_light && errors.b5_electric_light && showErrorInput(7, errors.b5_electric_light)
-                                                               // <FormHelperText error id="ht-b5_electric_light">
-                                                               //    {errors.b5_electric_light}
-                                                               // </FormHelperText>
-                                                            }
                                                             {/* Drenaje */}
                                                             <FormControlLabel
-                                                               control={<Checkbox defaultChecked={values.b5_sewer_system || false} />}
+                                                               control={<Checkbox checked={Boolean(values.b5_sewer_system) || false} />}
                                                                label="Drenaje"
                                                                id="b5_sewer_system"
                                                                name="b5_sewer_system"
-                                                               defaultChecked={false}
-                                                               checked={values.b5_sewer_system || false}
-                                                               value={2}
+                                                               value={true}
                                                                onChange={handleChange}
                                                                onBlur={handleBlur}
                                                                // disabled={values.id == 0 ? false : true}
-                                                               error={errors.b5_sewer_system}
-                                                               touched={touched.b5_sewer_system}
                                                             />
-                                                            {
-                                                               touched.b5_sewer_system && errors.b5_sewer_system && showErrorInput(7, errors.b5_sewer_system)
-                                                               // <FormHelperText error id="ht-b5_sewer_system">
-                                                               //    {errors.b5_sewer_system}
-                                                               // </FormHelperText>
-                                                            }
                                                             {/* Pavimento */}
                                                             <FormControlLabel
-                                                               control={<Checkbox defaultChecked={values.b5_pavement || false} />}
+                                                               control={<Checkbox checked={Boolean(values.b5_pavement) || false} />}
                                                                label="Pavimento"
                                                                id="b5_pavement"
                                                                name="b5_pavement"
-                                                               defaultChecked={false}
-                                                               checked={values.b5_pavement || false}
-                                                               value={2}
+                                                               value={true}
                                                                onChange={handleChange}
                                                                onBlur={handleBlur}
                                                                // disabled={values.id == 0 ? false : true}
-                                                               error={errors.b5_pavement}
-                                                               touched={touched.b5_pavement}
                                                             />
-                                                            {
-                                                               touched.b5_pavement && errors.b5_pavement && showErrorInput(7, errors.b5_pavement)
-                                                               // <FormHelperText error id="ht-b5_pavement">
-                                                               //    {errors.b5_pavement}
-                                                               // </FormHelperText>
-                                                            }
                                                          </FormGroup>
                                                       </Grid>
                                                       <Grid xs={12} md={6} sx={{ mb: 1 }}>
                                                          <FormGroup>
                                                             {/* Automóvil */}
                                                             <FormControlLabel
-                                                               control={<Checkbox defaultChecked={values.b5_automobile || false} />}
+                                                               control={<Checkbox checked={Boolean(values.b5_automobile) || false} />}
                                                                label="Automóvil"
                                                                id="b5_automobile"
                                                                name="b5_automobile"
-                                                               defaultChecked={false}
-                                                               checked={values.b5_automobile || false}
-                                                               value={2}
+                                                               value={true}
                                                                onChange={handleChange}
                                                                onBlur={handleBlur}
                                                                // disabled={values.id == 0 ? false : true}
-                                                               error={errors.b5_automobile}
-                                                               touched={touched.b5_automobile}
                                                             />
-                                                            {
-                                                               touched.b5_automobile && errors.b5_automobile && showErrorInput(7, errors.b5_automobile)
-                                                               // <FormHelperText error id="ht-b5_automobile">
-                                                               //    {errors.b5_automobile}
-                                                               // </FormHelperText>
-                                                            }
                                                             {/* Línea Telefónica */}
                                                             <FormControlLabel
-                                                               control={<Checkbox defaultChecked={values.b5_phone_line || false} />}
+                                                               control={<Checkbox checked={Boolean(values.b5_phone_line) || false} />}
                                                                label="Línea Telefónica"
                                                                id="b5_phone_line"
                                                                name="b5_phone_line"
-                                                               defaultChecked={false}
-                                                               checked={values.b5_phone_line || false}
-                                                               value={2}
+                                                               value={true}
                                                                onChange={handleChange}
                                                                onBlur={handleBlur}
                                                                // disabled={values.id == 0 ? false : true}
-                                                               error={errors.b5_phone_line}
-                                                               touched={touched.b5_phone_line}
                                                             />
-                                                            {
-                                                               touched.b5_phone_line && errors.b5_phone_line && showErrorInput(7, errors.b5_phone_line)
-                                                               // <FormHelperText error id="ht-b5_phone_line">
-                                                               //    {errors.b5_phone_line}
-                                                               // </FormHelperText>
-                                                            }
                                                             {/* Internet */}
                                                             <FormControlLabel
-                                                               control={<Checkbox defaultChecked={values.b5_internet || false} />}
+                                                               control={<Checkbox checked={Boolean(values.b5_internet) || false} />}
                                                                label="Internet"
                                                                id="b5_internet"
                                                                name="b5_internet"
-                                                               defaultChecked={false}
-                                                               checked={values.b5_internet || false}
-                                                               value={2}
+                                                               value={true}
                                                                onChange={handleChange}
                                                                onBlur={handleBlur}
                                                                // disabled={values.id == 0 ? false : true}
-                                                               error={errors.b5_internet}
-                                                               touched={touched.b5_internet}
                                                             />
-                                                            {
-                                                               touched.b5_internet && errors.b5_internet && showErrorInput(7, errors.b5_internet)
-                                                               // <FormHelperText error id="ht-b5_internet">
-                                                               //    {errors.b5_internet}
-                                                               // </FormHelperText>
-                                                            }
                                                          </FormGroup>
                                                       </Grid>
                                                    </Grid>
