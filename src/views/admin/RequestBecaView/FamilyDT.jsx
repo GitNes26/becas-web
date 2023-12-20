@@ -203,7 +203,7 @@ const FamilyDT = ({ becaId }) => {
    const data = [];
    const formatData = async () => {
       try {
-         // console.log("cargar listado", families);
+         console.log("cargar listado", families);
          families.sort((a, b) => a.id - b.id);
          monthlyIncome = 0;
 

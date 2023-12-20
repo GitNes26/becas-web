@@ -39,7 +39,7 @@ import sAlert from "../../../utils/sAlert";
 import IconSended from "../../../components/icons/IconSended";
 import Select2Component from "../../../components/Form/Select2Component";
 import InputsCommunityComponent, { getCommunity } from "../../../components/Form/InputsCommunityComponent";
-import { formatCurrency, handleInputFormik } from "../../../utils/Formats";
+import { formatCurrency, formatDatetimeToSQL, handleInputFormik } from "../../../utils/Formats";
 
 import DatePickerComponent from "../../../components/Form/DatePickerComponent";
 import { useDisabilityContext } from "../../../context/DisabilityContext";
@@ -171,14 +171,12 @@ const RequestBecaView = () => {
       setActiveStep(newActiveStep);
       if (pagina >= 4) location.hash = `/admin/solicitud-beca/pagina/${activeStep + 2}/folio/${folio}`;
       else location.hash = `/admin/solicitud-beca/pagina/${activeStep + 2}`;
-      console.log("adelanteeeeeee");
    };
 
    const handleBack = () => {
       setActiveStep((prevActiveStep) => prevActiveStep - 1);
       if (pagina >= 4) location.hash = `/admin/solicitud-beca/pagina/${activeStep}/folio/${folio}`;
       else location.hash = `/admin/solicitud-beca/pagina/${activeStep}`;
-      console.log("atrassssss");
    };
 
    const handleStep = (step) => () => {
@@ -426,7 +424,7 @@ const RequestBecaView = () => {
          folio = axiosResponse.result.folio;
          sAlert.Success(
             `Tu solicitud ha sido creada, termina de llenar el formulario para que se considere tu solicitud. Tu folio es: 
-            <h3>${folio}</h3> 
+            <h1>${folio}</h1> 
             <i>Puedes ver tus solicitudes guardadas y su estatus en la sección de "Mis Solicitudes" en tú menú lateral</i>`,
             null
          );
@@ -437,6 +435,7 @@ const RequestBecaView = () => {
          // resetFormData();
          handleComplete();
          location.hash = `/admin/solicitud-beca/pagina/${activeStep + 2}/folio/${folio}`;
+         setCompleted({ 0: true, 1: true, 2: true });
 
          // if (!checkAdd) setOpenDialog(false);
       } catch (error) {
@@ -596,6 +595,46 @@ const RequestBecaView = () => {
       }
    };
 
+   const onSubmit8 = async (values, { setSubmitting, setErrors, resetForm, setValues }) => {
+      try {
+         // console.log("formData en submit3", formData);
+         if (values.under_protest) values.b6_finished = true;
+
+         values.b6_beca_transport = values.b6_beca_transport ? true : false || false;
+         values.b6_beca_benito_juarez = values.b6_beca_benito_juarez ? true : false || false;
+         values.b6_beca_jovenes = values.b6_beca_jovenes ? true : false || false;
+         values.b6_other = values.b6_other ? true : false || false;
+         values.end_date = formatDatetimeToSQL(new Date());
+         await setFormData({ ...formData, ...values });
+         console.log("formData", values);
+         // return console.log("values", values);
+         // await setFormData(values);
+         // await setValues(formData);
+         setLoadingAction(true);
+         const axiosResponse = await saveBeca(folio, pagina, values);
+         setSubmitting(false);
+         setLoadingAction(false);
+
+         if (axiosResponse.status_code != 200) {
+            Toast.Success(axiosResponse.alert_text);
+            return Toast.Warning(axiosResponse.alert_title);
+         }
+         Toast.Customizable(axiosResponse.alert_text, axiosResponse.alert_icon);
+         // console.log("axiosResponse", axiosResponse);
+         setStepFailed(-1);
+         // resetForm();
+         // resetFormData();
+         handleComplete();
+         // if (!checkAdd) setOpenDialog(false);
+      } catch (error) {
+         console.error(error);
+         setErrors({ submit: error.message });
+         setSubmitting(false);
+      } finally {
+         setSubmitting(false);
+      }
+   };
+
    const onBlurCapture = () => {
       setStepFailed(-1);
    };
@@ -694,6 +733,9 @@ const RequestBecaView = () => {
             });
             break;
          case 8:
+            validationSchema = Yup.object().shape({
+               under_protest: Yup.bool().required("Bajo Protesta requerido")
+            });
             break;
          default:
             break;
@@ -742,10 +784,21 @@ const RequestBecaView = () => {
 
    const handleModify = async (setValues) => {
       try {
+         setCompleted({ 0: true, 1: true, 2: true });
          const ajaxResponse = await getRequestBecasByFolio(folio);
          console.log("holaaaaa familia", ajaxResponse.result.requestBecas);
+         if (ajaxResponse.result.requestBecas.monthly_income)
+            if (ajaxResponse.result.requestBecas.b3_finished)
+               if (ajaxResponse.result.requestBecas.b4_finished)
+                  if (ajaxResponse.result.requestBecas.b5_finished)
+                     if (ajaxResponse.result.requestBecas.b6_finished) setCompleted({ 0: true, 1: true, 2: true, 3: true, 4: true, 5: true, 6: true, 7: true });
+                     else setCompleted({ 0: true, 1: true, 2: true, 3: true, 4: true, 5: true, 6: true });
+                  else setCompleted({ 0: true, 1: true, 2: true, 3: true, 4: true, 5: true });
+               else setCompleted({ 0: true, 1: true, 2: true, 3: true, 4: true });
+            else setCompleted({ 0: true, 1: true, 2: true, 3: true });
+
          if (formData.description) formData.description == null && (formData.description = "");
-         setValues(ajaxResponse.result.requestBecas);
+         await setValues(ajaxResponse.result.requestBecas);
       } catch (error) {
          console.log(error);
          Toast.Error(error);
@@ -755,7 +808,7 @@ const RequestBecaView = () => {
    const handleChangeTotal = (e, values, setFieldValue) => {
       console.log("value", e.target.name);
       const name = e.target.name;
-      const value = Number(e.target.value);
+      const value = Number(e.target.value) || 0;
       const b3_food = name == "b3_food" ? value : values.b3_food,
          b3_transport = name == "b3_transport" ? value : values.b3_transport,
          b3_living_place = name == "b3_living_place" ? value : values.b3_living_place,
@@ -834,9 +887,12 @@ const RequestBecaView = () => {
                         <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", p: 5 }}>
                            <IconSended />
                            <Typography sx={{ my: 5 }} variant={"h3"} textAlign={"center"}>
-                              Toma captura a esta pantalla y guarda el Folio generado:
-                              <Typography sx={{ mt: 2, fontWeight: "bolder" }} variant={"h1"} component={"p"} textAlign={"center"}>
+                              Tú solicitud ha sido enviada, espera nuestra respuesta:
+                              <Typography sx={{ mt: 2, mb: 5, fontWeight: "bolder" }} variant={"h1"} component={"p"} textAlign={"center"}>
                                  No. Folio: {folio}
+                              </Typography>
+                              <Typography sx={{ fontWeight: "bolder" }}>
+                                 recuerda, puedes ver el estatus de tus solicitudes yendo a "Mis Solicitudes" en tú menú lateral
                               </Typography>
                            </Typography>
                            <Button onClick={handleReset} variant="contained" fullWidth>
@@ -1325,7 +1381,7 @@ const RequestBecaView = () => {
                                                 onBlur={handleBlur}
                                                 fullWidth
                                                 inputProps={{ step: 0.01, min: 0, max: 100000 }}
-                                                disabled={values.id == 0 ? false : true}
+                                                // disabled={values.id == 0 ? false : true}
                                                 error={errors.extra_income && touched.extra_income}
                                                 helperText={errors.extra_income && touched.extra_income && showErrorInput(4, errors.extra_income)}
                                              />
@@ -1343,7 +1399,7 @@ const RequestBecaView = () => {
                                                 onBlur={handleBlur}
                                                 fullWidth
                                                 inputProps={{ step: 0.01, min: 0, max: 100000 }}
-                                                disabled={values.id == 0 ? false : true}
+                                                // disabled={values.id == 0 ? false : true}
                                                 error={errors.monthly_income && touched.monthly_income}
                                                 helperText={errors.monthly_income && touched.monthly_income && showErrorInput(4, errors.monthly_income)}
                                              />
@@ -1920,7 +1976,7 @@ const RequestBecaView = () => {
                                                             />
                                                             {/* Drenaje */}
                                                             <FormControlLabel
-                                                               control={<Checkbox checked={Boolean(values.b5_sewer_system) || false} />}
+                                                               control={<Checkbox checked={values.b5_sewer_system || false} />}
                                                                label="Drenaje"
                                                                id="b5_sewer_system"
                                                                name="b5_sewer_system"
@@ -1931,7 +1987,7 @@ const RequestBecaView = () => {
                                                             />
                                                             {/* Pavimento */}
                                                             <FormControlLabel
-                                                               control={<Checkbox checked={Boolean(values.b5_pavement) || false} />}
+                                                               control={<Checkbox checked={values.b5_pavement || false} />}
                                                                label="Pavimento"
                                                                id="b5_pavement"
                                                                name="b5_pavement"
@@ -1946,7 +2002,7 @@ const RequestBecaView = () => {
                                                          <FormGroup>
                                                             {/* Automóvil */}
                                                             <FormControlLabel
-                                                               control={<Checkbox checked={Boolean(values.b5_automobile) || false} />}
+                                                               control={<Checkbox checked={values.b5_automobile || false} />}
                                                                label="Automóvil"
                                                                id="b5_automobile"
                                                                name="b5_automobile"
@@ -1957,7 +2013,7 @@ const RequestBecaView = () => {
                                                             />
                                                             {/* Línea Telefónica */}
                                                             <FormControlLabel
-                                                               control={<Checkbox checked={Boolean(values.b5_phone_line) || false} />}
+                                                               control={<Checkbox checked={values.b5_phone_line || false} />}
                                                                label="Línea Telefónica"
                                                                id="b5_phone_line"
                                                                name="b5_phone_line"
@@ -1968,7 +2024,7 @@ const RequestBecaView = () => {
                                                             />
                                                             {/* Internet */}
                                                             <FormControlLabel
-                                                               control={<Checkbox checked={Boolean(values.b5_internet) || false} />}
+                                                               control={<Checkbox checked={values.b5_internet || false} />}
                                                                label="Internet"
                                                                id="b5_internet"
                                                                name="b5_internet"
@@ -1991,7 +2047,7 @@ const RequestBecaView = () => {
                               </Formik>
                            )}
                            {activeStep + 1 == 8 && (
-                              <Formik initialValues={formData} validationSchema={{}} onSubmit={{}}>
+                              <Formik initialValues={formData} validationSchema={validationSchemas(activeStep + 1)} onSubmit={onSubmit8}>
                                  {({ errors, handleBlur, handleChange, handleSubmit, isSubmitting, touched, values, resetForm, setFieldValue, setValues }) => (
                                     <Box
                                        sx={{ height: "100%", display: "flex", flexDirection: "column", justifyContent: "space-between" }}
@@ -2017,87 +2073,71 @@ const RequestBecaView = () => {
                                                       <FormGroup sx={{ display: "flex", flexDirection: "row" }}>
                                                          {/* Beca de Transporte */}
                                                          <FormControlLabel
-                                                            control={<Checkbox defaultChecked={values.beca_transport} />}
+                                                            control={<Checkbox checked={values.b6_beca_transport || false} />}
                                                             label="Beca de Transporte"
-                                                            id="beca_transport"
-                                                            name="beca_transport"
-                                                            value={2}
+                                                            id="b6_beca_transport"
+                                                            name="b6_beca_transport"
+                                                            value={true}
                                                             onChange={handleChange}
                                                             onBlur={handleBlur}
-                                                            disabled={values.id == 0 ? false : true}
-                                                            error={errors.beca_transport}
-                                                            touched={touched.beca_transport}
+                                                            // disabled={values.id == 0 ? false : true}
                                                             sx={{ mr: 10 }}
                                                          />
-                                                         {
-                                                            touched.beca_transport && errors.beca_transport && showErrorInput(8, errors.beca_transport)
-                                                            // <FormHelperText error id="ht-beca_transport">
-                                                            //    {errors.beca_transport}
-                                                            // </FormHelperText>
-                                                         }
                                                          {/* Beca para el Bienestar Benito Juárez */}
                                                          <FormControlLabel
-                                                            control={<Checkbox defaultChecked={values.beca_benito_juarez} />}
+                                                            control={<Checkbox checked={values.b6_beca_benito_juarez || false} />}
                                                             label="Beca para el Bienestar Benito Juárez"
-                                                            id="beca_benito_juarez"
-                                                            name="beca_benito_juarez"
-                                                            value={2}
+                                                            id="b6_beca_benito_juarez"
+                                                            name="b6_beca_benito_juarez"
+                                                            value={true}
                                                             onChange={handleChange}
                                                             onBlur={handleBlur}
-                                                            disabled={values.id == 0 ? false : true}
-                                                            error={errors.beca_benito_juarez}
-                                                            touched={touched.beca_benito_juarez}
+                                                            // disabled={values.id == 0 ? false : true}
                                                             sx={{ mr: 10 }}
                                                          />
-                                                         {
-                                                            touched.beca_benito_juarez && errors.beca_benito_juarez && showErrorInput(8, errors.beca_benito_juarez)
-                                                            // <FormHelperText error id="ht-beca_benito_juarez">
-                                                            //    {errors.beca_benito_juarez}
-                                                            // </FormHelperText>
-                                                         }
-                                                         {/* Otra */}
-                                                         <FormControlLabel
-                                                            control={<Checkbox defaultChecked={values.other} />}
-                                                            label="Otra"
-                                                            id="other"
-                                                            name="other"
-                                                            value={2}
-                                                            onChange={handleChange}
-                                                            onBlur={handleBlur}
-                                                            disabled={values.id == 0 ? false : true}
-                                                            error={errors.other}
-                                                            touched={touched.other}
-                                                            sx={{ mr: 10 }}
-                                                         />
-                                                         {
-                                                            touched.other && errors.other && showErrorInput(8, errors.other)
-                                                            // <FormHelperText error id="ht-other">
-                                                            //    {errors.other}
-                                                            // </FormHelperText>
-                                                         }
                                                          {/* Beca Jóvenes Construyendo el Futuro */}
                                                          <FormControlLabel
-                                                            control={<Checkbox defaultChecked={values.beca_jovenes} />}
+                                                            control={<Checkbox checked={values.b6_beca_jovenes || false} />}
                                                             label="Beca Jóvenes Construyendo el Futuro"
-                                                            id="beca_jovenes"
-                                                            name="beca_jovenes"
-                                                            value={2}
+                                                            id="b6_beca_jovenes"
+                                                            name="b6_beca_jovenes"
+                                                            value={true}
                                                             onChange={handleChange}
                                                             onBlur={handleBlur}
-                                                            disabled={values.id == 0 ? false : true}
-                                                            error={errors.beca_jovenes}
-                                                            touched={touched.beca_jovenes}
+                                                            // disabled={values.id == 0 ? false : true}
+                                                            sx={{ mr: 10 }}
                                                          />
-                                                         {
-                                                            touched.beca_jovenes && errors.beca_jovenes && showErrorInput(8, errors.beca_jovenes)
-                                                            // <FormHelperText error id="ht-beca_jovenes">
-                                                            //    {errors.beca_jovenes}
-                                                            // </FormHelperText>
-                                                         }
+                                                         {/* Otra */}
+                                                         <FormControlLabel
+                                                            control={<Checkbox checked={values.b6_other || false} />}
+                                                            label="Otra"
+                                                            id="b6_other"
+                                                            name="b6_other"
+                                                            value={true}
+                                                            onChange={handleChange}
+                                                            onBlur={handleBlur}
+                                                            // disabled={values.id == 0 ? false : true}
+                                                            sx={{ mr: 10 }}
+                                                         />
                                                       </FormGroup>
                                                    </Grid>
                                                 </FormControl>
                                              </ol>
+
+                                             {/* Bajo Protesta */}
+                                             <FormControlLabel
+                                                control={<Checkbox checked={values.under_protest || false} />}
+                                                label="Bajo Protesta de decir la verdad, manifiesto que la información proporcionada en esta solicitud es verídica."
+                                                id="under_protest"
+                                                name="under_protest"
+                                                value={true}
+                                                onChange={handleChange}
+                                                onBlur={handleBlur}
+                                                // disabled={values.id == 0 ? false : true}
+                                                error={errors.under_protest}
+                                                touched={touched.under_protest}
+                                             />
+                                             {touched.under_protest && errors.under_protest && showErrorInput(8, errors.under_protest, true)}
                                           </Grid>
                                        </Grid>
 

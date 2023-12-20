@@ -146,12 +146,12 @@ const RequestBecaDT = () => {
    //    }
    // };
 
-   const ButtonsAction = ({ id, name }) => {
+   const ButtonsAction = ({ id, name, current_page }) => {
       return (
          <ButtonGroup variant="outlined">
             <Tooltip title={`Solicitud ${name}`} placement="top">
                <Button color="primary">
-                  <Link to={`/admin/solicitud-beca/pagina/4/folio/${id}`} target="_blank" style={{ textDecoration: "none" }}>
+                  <Link to={`/admin/solicitud-beca/pagina/${current_page}/folio/${id}`} target="_blank" style={{ textDecoration: "none" }}>
                      {/* <IconEye /> */}
                      Continuar
                   </Link>
@@ -187,7 +187,7 @@ const RequestBecaDT = () => {
             let register = obj;
             register.key = index + 1;
             register.created_at = formatDatetime(obj.created_at, true);
-            register.actions = <ButtonsAction id={obj.id} name={obj.folio} />;
+            register.actions = <ButtonsAction id={obj.id} name={obj.folio} current_page={obj.current_page} />;
             data.push(register);
          });
          // if (data.length > 0) setGlobalFilterFields(Object.keys(requestBecas[0]));

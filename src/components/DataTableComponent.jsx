@@ -90,8 +90,9 @@ export default function DataTableComponent({
 
       setData(_data);
 
-      document.querySelector(`#${idName} tbody`).childNodes[0].querySelector("button").click();
-      // // setData(newRow);
+      setTimeout(() => {
+         document.querySelector(`#${idName} tbody`).childNodes[0].querySelector("button").click();
+      }, 100); // // setData(newRow);
       // console.log(data);
    };
 
@@ -112,6 +113,7 @@ export default function DataTableComponent({
    const onRowEditComplete = async (e) => {
       try {
          // console.log(e);
+         console.log(data);
          let _data = [...data];
          let { newData, index } = e;
 
