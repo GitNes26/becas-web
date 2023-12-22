@@ -16,7 +16,7 @@ import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
 import sAlert, { QuestionAlertConfig } from "../../../utils/sAlert";
 import Toast from "../../../utils/Toast";
-import { ROLE_SUPER_ADMIN, useGlobalContext } from "../../../context/GlobalContext";
+import { ROLE_ADMIN, ROLE_SUPER_ADMIN, useGlobalContext } from "../../../context/GlobalContext";
 import DataTableComponent from "../../../components/DataTableComponent";
 import { IconEye } from "@tabler/icons";
 import { formatDatetime } from "../../../utils/Formats";
@@ -25,6 +25,7 @@ import { useAuthContext } from "../../../context/AuthContext";
 import { IconCircleCheckFilled } from "@tabler/icons-react";
 import { IconCircleXFilled } from "@tabler/icons-react";
 import SwitchComponent from "../../../components/SwitchComponent";
+import { object } from "prop-types";
 
 const RequestBecaDT = () => {
    const { auth } = useAuthContext();
@@ -94,6 +95,10 @@ const RequestBecaDT = () => {
 
    const mySwal = withReactContent(Swal);
 
+   const handleClickView = (obj) => {
+      console.log(obj);
+   };
+
    const handleClickAdd = () => {
       try {
          location.hash = "/admin/solicitud-beca";
@@ -146,9 +151,16 @@ const RequestBecaDT = () => {
    //    }
    // };
 
-   const ButtonsAction = ({ id, name, current_page }) => {
+   const ButtonsAction = ({ id, name, current_page, obj }) => {
       return (
          <ButtonGroup variant="outlined">
+            {auth.role_id <= ROLE_ADMIN && (
+               <Tooltip title={`Ver Solicitud ${singularName}`} placement="top">
+                  <Button color="dark" onClick={() => handleClickView(obj)}>
+                     <IconEye />
+                  </Button>
+               </Tooltip>
+            )}
             <Tooltip title={`Solicitud ${name}`} placement="top">
                <Button color="primary">
                   <Link to={`/admin/solicitud-beca/pagina/${current_page}/folio/${id}`} target="_blank" style={{ textDecoration: "none" }}>
@@ -186,8 +198,7 @@ const RequestBecaDT = () => {
             // console.log(obj);
             let register = obj;
             register.key = index + 1;
-            register.created_at = formatDatetime(obj.created_at, true);
-            register.actions = <ButtonsAction id={obj.id} name={obj.folio} current_page={obj.current_page} />;
+            register.actions = <ButtonsAction id={obj.id} name={obj.folio} current_page={obj.current_page} obj={obj} />;
             data.push(register);
          });
          // if (data.length > 0) setGlobalFilterFields(Object.keys(requestBecas[0]));
