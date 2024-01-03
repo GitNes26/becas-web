@@ -7,9 +7,24 @@ import FormControl from "@mui/material/FormControl";
 import Select from "@mui/material/Select";
 import { CacheProvider } from "@emotion/react";
 import createCache from "@emotion/cache";
-import { Button, ButtonGroup, Tooltip, Typography } from "@mui/material";
+import {
+   Button,
+   ButtonGroup,
+   Dialog,
+   DialogActions,
+   DialogContent,
+   DialogContentText,
+   DialogTitle,
+   FormControlLabel,
+   IconButton,
+   Switch,
+   Toolbar,
+   Tooltip,
+   Typography
+} from "@mui/material";
 import IconEdit from "../../../components/icons/IconEdit";
 import IconDelete from "../../../components/icons/IconDelete";
+import { IconX, IconWindowMaximize, IconWindowMinimize } from "@tabler/icons-react";
 
 import { useRequestBecaContext } from "../../../context/RequestBecaContext";
 import Swal from "sweetalert2";
@@ -26,6 +41,10 @@ import { IconCircleCheckFilled } from "@tabler/icons-react";
 import { IconCircleXFilled } from "@tabler/icons-react";
 import SwitchComponent from "../../../components/SwitchComponent";
 import { object } from "prop-types";
+import { Box } from "@mui/system";
+import DialogComponent from "../../../components/DialogComponent";
+import SimpleTableComponent from "../../../components/Table/SimpleTableComponent";
+// import { Preview, print } from "react-html2pdf";
 
 const RequestBecaDT = () => {
    const { auth } = useAuthContext();
@@ -33,6 +52,9 @@ const RequestBecaDT = () => {
    const { singularName, pluralName, requestBecas, setRequestBecas, getRequestBecas, showRequestBeca, deleteRequestBeca, setTextBtnSumbit, setFormTitle } =
       useRequestBecaContext();
    const globalFilterFields = ["folio", "code", "level", "school", "curp", "name", "paternal_last_name", "maternal_last_name", "average", "status", "created_at"];
+
+   const [openDialogPreview, setOpenDialogPreview] = useState(false);
+   const [fullScreenDialog, setFullScreenDialog] = useState(false);
 
    //#region BODY TEMPLATES
    const FolioBodyTemplate = (obj) => (
@@ -97,6 +119,14 @@ const RequestBecaDT = () => {
 
    const handleClickView = (obj) => {
       console.log(obj);
+      setOpenDialogPreview(true);
+      // <Preview id={"jsx-template"}>
+      //    <p>adsf</p>
+      // </Preview>;
+      // print("a", "jsx-template");
+      // {
+      //    /* <button onClick={()=>print('a', 'jsx-template')}> print</button> */
+      // }
    };
 
    const handleClickAdd = () => {
@@ -214,17 +244,58 @@ const RequestBecaDT = () => {
    useEffect(() => {
       setLoading(false);
    }, []);
+
    return (
-      <DataTableComponent
-         columns={columns}
-         data={data}
-         setData={setRequestBecas}
-         globalFilterFields={globalFilterFields}
-         headerFilters={false}
-         handleClickAdd={handleClickAdd}
-         rowEdit={false}
-         refreshTable={getRequestBecas}
-      />
+      <>
+         <DataTableComponent
+            columns={columns}
+            data={data}
+            setData={setRequestBecas}
+            globalFilterFields={globalFilterFields}
+            headerFilters={false}
+            handleClickAdd={handleClickAdd}
+            rowEdit={false}
+            refreshTable={getRequestBecas}
+         />
+
+         <Dialog fullWidth maxWidth={"lg"} fullScreen={fullScreenDialog} open={openDialogPreview} onClose={() => setOpenDialogPreview(false)}>
+            {/* <DialogTitle> */}
+            <Toolbar>
+               <Typography sx={{ ml: 2, flex: 1 }} variant="h3" component="div">
+                  {"title"}
+               </Typography>
+               <Tooltip title={`Cerrar ventana`} placement="top">
+                  <Tooltip title={fullScreenDialog ? `Minimizar ventana` : `Maximizar ventana`} placement="top">
+                     <IconButton autoFocus color="inherit" onClick={() => setFullScreenDialog(!fullScreenDialog)}>
+                        {fullScreenDialog ? <IconWindowMinimize /> : <IconWindowMaximize />}
+                     </IconButton>
+                  </Tooltip>
+                  <IconButton edge="end" color="inherit" onClick={() => setOpenDialogPreview(false)} aria-label="close">
+                     <IconX />
+                  </IconButton>
+               </Tooltip>
+            </Toolbar>
+            {/* </DialogTitle> */}
+            <DialogContent>
+               {/* <DialogContentText>You can set my maximum width and whether to adapt or not.</DialogContentText> */}
+               <Box
+                  noValidate
+                  component="form"
+                  sx={{
+                     display: "flex",
+                     flexDirection: "column",
+                     m: "auto",
+                     width: "95%"
+                  }}
+               >
+                  <SimpleTableComponent />
+               </Box>
+            </DialogContent>
+            <DialogActions>
+               <Button onClick={() => Toast.Success("Guardado")}>Guardar</Button>
+            </DialogActions>
+         </Dialog>
+      </>
    );
 };
 export default RequestBecaDT;
