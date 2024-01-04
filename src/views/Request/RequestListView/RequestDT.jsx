@@ -24,7 +24,7 @@ import {
 } from "@mui/material";
 import IconEdit from "../../../components/icons/IconEdit";
 import IconDelete from "../../../components/icons/IconDelete";
-import { IconX, IconWindowMaximize, IconWindowMinimize } from "@tabler/icons-react";
+import { IconX, IconWindowMaximize, IconWindowMinimize, IconFileTypePdf } from "@tabler/icons-react";
 
 import { useRequestBecaContext } from "../../../context/RequestBecaContext";
 import Swal from "sweetalert2";
@@ -33,7 +33,7 @@ import sAlert, { QuestionAlertConfig } from "../../../utils/sAlert";
 import Toast from "../../../utils/Toast";
 import { ROLE_ADMIN, ROLE_SUPER_ADMIN, useGlobalContext } from "../../../context/GlobalContext";
 import DataTableComponent from "../../../components/DataTableComponent";
-import { IconEye } from "@tabler/icons";
+import { IconEye, IconPrinter } from "@tabler/icons";
 import { formatDatetime } from "../../../utils/Formats";
 import { Link } from "react-router-dom";
 import { useAuthContext } from "../../../context/AuthContext";
@@ -43,7 +43,8 @@ import SwitchComponent from "../../../components/SwitchComponent";
 import { object } from "prop-types";
 import { Box } from "@mui/system";
 import DialogComponent from "../../../components/DialogComponent";
-import SimpleTableComponent from "../../../components/Table/SimpleTableComponent";
+import RequestReport from "./RequestReport";
+import { getCommunityById } from "../../../components/Form/InputsCommunityComponent";
 // import { Preview, print } from "react-html2pdf";
 
 const RequestBecaDT = () => {
@@ -55,6 +56,7 @@ const RequestBecaDT = () => {
 
    const [openDialogPreview, setOpenDialogPreview] = useState(false);
    const [fullScreenDialog, setFullScreenDialog] = useState(false);
+   const [objReport, setObjReport] = useState(null);
 
    //#region BODY TEMPLATES
    const FolioBodyTemplate = (obj) => (
@@ -117,16 +119,16 @@ const RequestBecaDT = () => {
 
    const mySwal = withReactContent(Swal);
 
-   const handleClickView = (obj) => {
+   const handleClickView = async (obj) => {
+      setLoadingAction(true);
       console.log(obj);
+      const community = await getCommunityById(obj.community_id);
+      const school_community = await getCommunityById(obj.school_community_id);
+      obj.community = community;
+      obj.school_community = school_community;
+      setObjReport(obj);
       setOpenDialogPreview(true);
-      // <Preview id={"jsx-template"}>
-      //    <p>adsf</p>
-      // </Preview>;
-      // print("a", "jsx-template");
-      // {
-      //    /* <button onClick={()=>print('a', 'jsx-template')}> print</button> */
-      // }
+      setLoadingAction(false);
    };
 
    const handleClickAdd = () => {
@@ -241,6 +243,16 @@ const RequestBecaDT = () => {
    };
    formatData();
 
+   const printContent = (idContent) => {
+      var content = document.getElementById(idContent).innerHTML;
+      var printWindow = window.open("", "_blank");
+      printWindow.document.write("<html><head><title>Imprimir contenido</title></head><body>");
+      printWindow.document.write(content);
+      printWindow.document.write("</body></html>");
+      printWindow.document.close();
+      printWindow.print();
+   };
+
    useEffect(() => {
       setLoading(false);
    }, []);
@@ -264,12 +276,22 @@ const RequestBecaDT = () => {
                <Typography sx={{ ml: 2, flex: 1 }} variant="h3" component="div">
                   {"title"}
                </Typography>
+               <Tooltip title={`Exportar Reporte a PDF`} placement="top">
+                  <IconButton color="inherit" onClick={() => Toast.Success("PDF")}>
+                     <IconFileTypePdf color="red" />
+                  </IconButton>
+               </Tooltip>
+               <Tooltip title={`Imprimir Reporte`} placement="top">
+                  <IconButton color="inherit" onClick={() => printContent("reportPaper")}>
+                     <IconPrinter />
+                  </IconButton>
+               </Tooltip>
+               <Tooltip title={fullScreenDialog ? `Minimizar ventana` : `Maximizar ventana`} placement="top">
+                  <IconButton color="inherit" onClick={() => setFullScreenDialog(!fullScreenDialog)}>
+                     {fullScreenDialog ? <IconWindowMinimize /> : <IconWindowMaximize />}
+                  </IconButton>
+               </Tooltip>
                <Tooltip title={`Cerrar ventana`} placement="top">
-                  <Tooltip title={fullScreenDialog ? `Minimizar ventana` : `Maximizar ventana`} placement="top">
-                     <IconButton autoFocus color="inherit" onClick={() => setFullScreenDialog(!fullScreenDialog)}>
-                        {fullScreenDialog ? <IconWindowMinimize /> : <IconWindowMaximize />}
-                     </IconButton>
-                  </Tooltip>
                   <IconButton edge="end" color="inherit" onClick={() => setOpenDialogPreview(false)} aria-label="close">
                      <IconX />
                   </IconButton>
@@ -288,7 +310,7 @@ const RequestBecaDT = () => {
                      width: "95%"
                   }}
                >
-                  <SimpleTableComponent />
+                  <RequestReport obj={objReport} />
                </Box>
             </DialogContent>
             <DialogActions>

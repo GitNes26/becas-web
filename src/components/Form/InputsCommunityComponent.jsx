@@ -40,6 +40,13 @@ import Select2Component from "./Select2Component";
    );
 */
 
+export const getCommunityById = async (community_id) => {
+   const axiosMyCommunity = axios;
+   const { data } = await axiosMyCommunity.get(`${import.meta.env.VITE_API_CP}/cp/colonia/${community_id}`);
+   console.log(data.data);
+   return data.data.result;
+};
+
 export const getCommunity = async (
    zip,
    setFieldValue,

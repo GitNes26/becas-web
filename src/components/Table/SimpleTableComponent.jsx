@@ -75,23 +75,33 @@ export default function SimpleTableComponent() {
    };
 
    return (
-      <Paper sx={{ width: "100%", overflow: "hidden" }}>
+      <Paper id="reportPaper" sx={{ width: "100%", overflow: "hidden" }}>
          <Table stickyHeader aria-label="sticky table">
             <TableHead>
-               <TableRow>
-                  <TableCell key={1} align={"left"}>
+               <TableRow sx={{ border: "none" }}>
+                  <TableCell align={"left"}>
                      <img src={logo_gpd} style={{ width: 150 }} />
                   </TableCell>
-                  <TableCell key={1} align={"center"}>
+                  <TableCell align={"center"}>
                      <img src={logo_gpd} style={{ width: 150 }} />
                   </TableCell>
-                  <TableCell key={1} align={"right"}>
+                  <TableCell align={"right"}>
                      <img src={logo_gpd} style={{ width: 150 }} />
                   </TableCell>
                </TableRow>
                <TableRow>
-                  <TableCell key={1} colSpan={3} align={"center"}>
-                     <Typography>DIRECCIÓN DE EDUCACIÓN</Typography>
+                  <TableCell colSpan={3} align={"center"}>
+                     <Typography variant="h1">DIRECCIÓN DE EDUCACIÓN</Typography>
+                     <Typography variant="h4">PROGRAMA DE BECAS MUNICIPALES</Typography>
+                     <Typography variant="p">ESTUDIO-SOCIOECONOMICO</Typography>
+                  </TableCell>
+               </TableRow>
+               <TableRow>
+                  <TableCell colSpan={3} align={"center"}>
+                     <Typography variant="p" align="justify" mb={2} sx={{ fontWeight: "normal", maxWidth: "70%" }}>
+                        El presente cuestionario tiene por objetivo conocer el perfil de los aspirantes a obtener una beca del <b>R. Ayuntamiento de Gómez Palacio</b>.
+                        La información proporcionada de aqui debe ser completamente verdadera, por ello, lee con atención cada pregunta y contesta adecuadamente.
+                     </Typography>
                   </TableCell>
                </TableRow>
             </TableHead>

@@ -195,6 +195,25 @@ export default function RequestBecaContextProvider({ children }) {
       }
    };
 
+   const getReportRequestByFolio = async (folio) => {
+      try {
+         const res = CorrectRes;
+         const axiosData = await Axios.get(`/becas/report/folio/${folio}`);
+         res.result.requestBecas = axiosData.data.data.result;
+         console.log("res", res.result.requestBecas);
+         await setRequestBeca(axiosData.data.data.result.requestBecas);
+         await setFormData(res.result.requestBecas);
+         // console.log("requestBecas", requestBecas);
+
+         return res;
+      } catch (error) {
+         const res = ErrorRes;
+         console.log(error);
+         res.message = error;
+         res.alert_text = error;
+      }
+   };
+
    const getRequestBecasByUser = async (user_id) => {
       try {
          const res = CorrectRes;
@@ -312,7 +331,8 @@ export default function RequestBecaContextProvider({ children }) {
             deleteRequestBeca,
             getRequestBecasByUser,
             getRequestBecasByFolio,
-            saveBeca
+            saveBeca,
+            getReportRequestByFolio
          }}
       >
          {children}
