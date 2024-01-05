@@ -181,7 +181,7 @@ export default function RequestBecaContextProvider({ children }) {
          const res = CorrectRes;
          const axiosData = await Axios.get(`/becas/folio/${folio}`);
          res.result.requestBecas = axiosData.data.data.result;
-         console.log("res", res.result.requestBecas);
+         // console.log("res", res.result.requestBecas);
          await setRequestBeca(axiosData.data.data.result.requestBecas);
          await setFormData(res.result.requestBecas);
          // console.log("requestBecas", requestBecas);
@@ -200,7 +200,7 @@ export default function RequestBecaContextProvider({ children }) {
          const res = CorrectRes;
          const axiosData = await Axios.get(`/becas/report/folio/${folio}`);
          res.result.requestBecas = axiosData.data.data.result;
-         console.log("res", res.result.requestBecas);
+         // console.log("res", res.result.requestBecas);
          await setRequestBeca(axiosData.data.data.result.requestBecas);
          await setFormData(res.result.requestBecas);
          // console.log("requestBecas", requestBecas);

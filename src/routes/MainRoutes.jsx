@@ -20,6 +20,7 @@ import RelationshipContextProvider from "../context/RelationshipContext";
 import TutorContextProvider from "../context/TutorContext";
 import { loaderIndexUsersView } from "../views/admin/UsersView/Index";
 import FamilyContextProvider from "../context/FamilyContext";
+import RequestListView from "../views/Request/RequestListView/RequestListView";
 
 // dashboard routing
 const DashboardDefault = Loadable(lazy(() => import("../views/dashboard/Default")));
@@ -110,6 +111,22 @@ const MainRoutes = {
                   <DisabilityContextProvider>
                      <DisabilitiesView />
                   </DisabilityContextProvider>
+               )
+            }
+         ]
+      },
+      {
+         path: "solicitudes",
+         children: [
+            {
+               index: true,
+               // path: "/",
+               element: (
+                  <RequestBecaContextProvider>
+                     <FamilyContextProvider>
+                        <RequestListView />
+                     </FamilyContextProvider>
+                  </RequestBecaContextProvider>
                )
             }
          ]
