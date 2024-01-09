@@ -56,9 +56,9 @@ export default function FamilyContextProvider({ children }) {
       try {
          setFamilies([]);
          const res = CorrectRes;
-         console.log("getFamilies() ejecutado... folio", folio);
+         // console.log("getFamilies() ejecutado... folio", folio);
          const axiosData = await Axios.get(`/families/beca/folio/${folio}`);
-         console.log("getIndexByFolio() -> axiosData", axiosData.data.data.result);
+         // console.log("getIndexByFolio() -> axiosData", axiosData.data.data.result);
          res.result.families = axiosData.data.data.result;
          setFamilies(axiosData.data.data.result);
          // console.log("families", families);

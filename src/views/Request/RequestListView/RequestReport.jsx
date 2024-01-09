@@ -11,11 +11,21 @@ import TableRow from "@mui/material/TableRow";
 import logo_gpd from "/src/assets/images/logo-gpd.png";
 import { width } from "@mui/system";
 import { Typography } from "@mui/material";
-import { formatDatetime, formatPhone } from "../../../utils/Formats";
+import { formatCurrency, formatDatetime, formatPhone, splitArroba } from "../../../utils/Formats";
+import Toast from "../../../utils/Toast";
+import { IconCheck } from "@tabler/icons";
+import CloseIcon from "@mui/icons-material/Close";
 
 export default function RequestReport({ obj }) {
-   // const {get}
-   
+   const checkCross = (value) => {
+      try {
+         return value ? <IconCheck /> : <CloseIcon />;
+      } catch (error) {
+         console.log(error);
+         Toast.Error(error);
+      }
+   };
+
    const tableRows = [
       //DATOS GENERALES
       {
@@ -87,6 +97,20 @@ export default function RequestReport({ obj }) {
                ]
             },
             {
+               // MAS DATOS
+               tHeadRows: [
+                  [{ colSpan: null, title: null }],
+                  [
+                     { colSpan: 2, title: "Grado escolar" },
+                     { colSpan: 3, title: "Promedio" }
+                  ]
+               ],
+               tBodyCells: [
+                  { colSpan: 2, value: obj.grade },
+                  { colSpan: 3, value: obj.average }
+               ]
+            },
+            {
                //COMUNIDAD p1
                tHeadRows: [
                   [{ colSpan: null, title: null }],
@@ -151,14 +175,16 @@ export default function RequestReport({ obj }) {
                      { colSpan: null, title: "C.P." },
                      { colSpan: null, title: "Estado" },
                      { colSpan: null, title: "Municipio" },
-                     { colSpan: 2, title: "Perímetro" }
+                     { colSpan: null, title: "Local o Foranea" },
+                     { colSpan: null, title: "Perímetro" }
                   ]
                ],
                tBodyCells: [
                   { colSpan: null, value: obj.school_community.CodigoPostal },
                   { colSpan: null, value: obj.school_community.Estado },
                   { colSpan: null, value: obj.school_community.Municipio },
-                  { colSpan: 2, value: obj.school_community.Perimetro }
+                  { colSpan: null, value: obj.loc_for ? "LOCAL" : "FORANEA" },
+                  { colSpan: null, value: obj.school_community.Perimetro }
                ]
             },
             {
@@ -184,26 +210,169 @@ export default function RequestReport({ obj }) {
             {
                tHeadRows: [
                   [{ colSpan: 4, title: "DATOS FAMILIARES" }],
-                  [{ colSpan: 4, title: "¿Con Quienes vive actualmente el alumno?" }],
+                  [{ colSpan: 4, title: "¿Con quienes vive actualmente el alumno?" }],
                   [
                      { colSpan: null, title: "Parentesco" },
-                     { colSpan: null, title: "Edad" },
+                     { colSpan: null, title: "Edad (años)" },
                      { colSpan: null, title: "Ocupación" },
                      { colSpan: null, title: "Ingresos Mensuales" }
                   ]
                ],
+               tBodyCells: obj.families.map((f) => [
+                  { colSpan: null, value: f.relationship },
+                  { colSpan: null, value: f.age },
+                  { colSpan: null, value: f.occupation },
+                  { colSpan: null, value: formatCurrency(f.monthly_income) }
+               ])
+            },
+            {
+               //INGRESOS
+               tHeadRows: [
+                  [{ colSpan: null, title: null }],
+                  [
+                     { colSpan: 2, title: "Otros Ingresos extras" },
+                     { colSpan: 3, title: "Total de ingresos MENSUALES" }
+                  ]
+               ],
                tBodyCells: [
-
-                  { colSpan: null, value: obj.tutor_curp },
-                  { colSpan: null, value: obj.relationship },
-                  { colSpan: null, value: `${obj.tutor_name} ${obj.tutor_paternal_last_name} ${obj.tutor_maternal_last_name}` },
-                  { colSpan: null, value: formatPhone(obj.tutor_phone) }
+                  { colSpan: 2, value: formatCurrency(obj.extra_income) },
+                  { colSpan: 3, value: formatCurrency(obj.monthly_income) }
+               ]
+            }
+         ]
+      },
+      //DATOS ECONOMICOS
+      {
+         TableCellcolSpan: 6,
+         table: [
+            {
+               tHeadRows: [
+                  [{ colSpan: 6, title: "DATOS ECONÓMICOS" }],
+                  [{ colSpan: 6, title: "Persona(s) que sostiene el hogar (Padre, Madre, Abuelo) --- Detalle de gastos MENSUALES Familiares" }],
+                  [
+                     { colSpan: null, title: "Alimentaciópn (Despensa)" },
+                     { colSpan: null, title: "Transporte" },
+                     { colSpan: null, title: "Vivienda (renta, infonavit)" },
+                     { colSpan: null, title: "Servicios (agua y luz)" },
+                     { colSpan: null, title: "Automóvil" },
+                     { colSpan: null, title: "TOTAL DE  EGRESOS" }
+                  ]
+               ],
+               tBodyCells: [
+                  { colSpan: null, value: formatCurrency(obj.b3_food) },
+                  { colSpan: null, value: formatCurrency(obj.b3_transport) },
+                  { colSpan: null, value: formatCurrency(obj.b3_living_place) },
+                  { colSpan: null, value: formatCurrency(obj.b3_services) },
+                  { colSpan: null, value: formatCurrency(obj.b3_automobile) },
+                  { colSpan: null, value: formatCurrency(obj.total_expenses) }
+               ]
+            }
+         ]
+      },
+      //DATOS DE LA VIVIENDA
+      {
+         TableCellcolSpan: 5,
+         table: [
+            {
+               tHeadRows: [
+                  [{ colSpan: 3, title: "DATOS DE LA VIVIENDA" }],
+                  [
+                     { colSpan: null, title: "La casa donde vivo es" },
+                     { colSpan: null, title: "Material de techo" },
+                     { colSpan: null, title: "Material del piso" }
+                  ]
+               ],
+               tBodyCells: [
+                  { colSpan: null, value: splitArroba(obj.b4_house_is, false) },
+                  { colSpan: null, value: splitArroba(obj.b4_roof_material, false) },
+                  { colSpan: null, value: splitArroba(obj.b4_floor_material, false) }
+               ]
+            }
+         ]
+      },
+      //EQUIPAMIENTO DOMÉSTICO
+      {
+         TableCellcolSpan: 5,
+         table: [
+            {
+               tHeadRows: [
+                  [{ colSpan: 9, title: "EQUIPAMIENTO DOMÉSTICO" }],
+                  [{ colSpan: 9, title: "Aparatos/Muebles con los que cuentan en casa" }],
+                  [
+                     { colSpan: null, title: "Camas" },
+                     { colSpan: null, title: "Lavadora de ropa" },
+                     { colSpan: null, title: "Calentador de agua (boiler)" },
+                     { colSpan: null, title: "Televisores" },
+                     { colSpan: null, title: "Computadoras" },
+                     { colSpan: null, title: "Teléfono local o celular" },
+                     { colSpan: null, title: "Reprodcutor de música" },
+                     { colSpan: null, title: "Estufa" },
+                     { colSpan: null, title: "Refrigerador" }
+                  ]
+               ],
+               tBodyCells: [
+                  { colSpan: null, value: obj.b5_beds },
+                  { colSpan: null, value: obj.b5_washing_machines },
+                  { colSpan: null, value: obj.b5_boilers },
+                  { colSpan: null, value: obj.b5_tvs },
+                  { colSpan: null, value: obj.b5_pcs },
+                  { colSpan: null, value: obj.b5_phones },
+                  { colSpan: null, value: obj.b5_music_player },
+                  { colSpan: null, value: obj.b5_stoves },
+                  { colSpan: null, value: obj.b5_refrigerators }
+               ]
+            },
+            {
+               tHeadRows: [
+                  [{ colSpan: 9, title: "¿Cuáles son los servicios con que cuentas en tu casa" }],
+                  [
+                     { colSpan: null, title: "Agua Potable" },
+                     { colSpan: 2, title: "Luz Eléctrica" },
+                     { colSpan: null, title: "Drenaje" },
+                     { colSpan: null, title: "Pavimento" },
+                     { colSpan: null, title: "Automóvil" },
+                     { colSpan: 2, title: "Línea Telefónica" },
+                     { colSpan: null, title: "Internet" }
+                  ]
+               ],
+               tBodyCells: [
+                  { colSpan: null, value: checkCross(obj.b5_drinking_water) },
+                  { colSpan: 2, value: checkCross(obj.b5_electric_light) },
+                  { colSpan: null, value: checkCross(obj.b5_sewer_system) },
+                  { colSpan: null, value: checkCross(obj.b5_pavement) },
+                  { colSpan: null, value: checkCross(obj.b5_automobile) },
+                  { colSpan: 2, value: checkCross(obj.b5_phone_line) },
+                  { colSpan: null, value: checkCross(obj.b5_internet) }
+               ]
+            }
+         ]
+      },
+      //PROGRAMAS DE BECAS
+      {
+         TableCellcolSpan: 5,
+         table: [
+            {
+               tHeadRows: [
+                  [{ colSpan: 4, title: "PROGRAMAS DE BECAS" }],
+                  [{ colSpan: 4, title: "¿Tu familia es beneficiaria de algunas de las siguientes becas?" }],
+                  [
+                     { colSpan: null, title: "Transporte" },
+                     { colSpan: null, title: "Beca para el bienestar Benito Juárez" },
+                     { colSpan: null, title: "Jóvenes Construyendo el futuro" },
+                     { colSpan: null, title: "Otra" }
+                  ]
+               ],
+               tBodyCells: [
+                  { colSpan: null, value: checkCross(obj.b6_beca_transport) },
+                  { colSpan: null, value: checkCross(obj.b6_beca_benito_juarez) },
+                  { colSpan: null, value: checkCross(obj.b6_beca_jovenes) },
+                  { colSpan: null, value: checkCross(obj.b6_other) }
                ]
             }
          ]
       }
    ];
-   console.log(tableRows);
+   // console.log(tableRows);
 
    return (
       <Paper id="reportPaper" sx={{ width: "100%", overflow: "hidden" }}>
@@ -238,20 +407,25 @@ export default function RequestReport({ obj }) {
                </TableRow>
             </TableHead>
             <TableBody>
-               {/* DATOS GENERALES */}
-               {tableRows.map((tr) => (
+               {/* DATOS */}
+               {tableRows.map((tr, trIndex) => (
                   <TableRow>
-                     <TableCell colSpan={tr.TableCellcolSpan}>
-                        <Table>
+                     <TableCell key={`tc_${trIndex}`} colSpan={tr.TableCellcolSpan}>
+                        <Table key={`table__${trIndex}`}>
                            {tr.table.map((t) => (
                               <>
                                  <TableHead>
                                     {t.tHeadRows.map((thr, index) => {
                                        if (thr[0].title === null) return;
                                        return (
-                                          <TableRow>
-                                             {thr.map((tcTitle) => (
-                                                <TableCell colSpan={tcTitle.colSpan} align={"center"} style={{ backgroundColor: "#364152", color: "whitesmoke" }}>
+                                          <TableRow key={index}>
+                                             {thr.map((tcTitle, innerIndex) => (
+                                                <TableCell
+                                                   key={`arrayTHCell_${index}_${innerIndex}`}
+                                                   colSpan={tcTitle.colSpan}
+                                                   align={"center"}
+                                                   style={{ backgroundColor: "#364152", color: "whitesmoke" }}
+                                                >
                                                    {tcTitle.title}
                                                 </TableCell>
                                              ))}
@@ -260,13 +434,24 @@ export default function RequestReport({ obj }) {
                                     })}
                                  </TableHead>
                                  <TableBody>
-                                    <TableRow hover role="checkbox" tabIndex={-1}>
-                                       {t.tBodyCells.map((tcValue) => (
-                                          <TableCell colSpan={tcValue.colSpan} align={"center"}>
-                                             {tcValue.value}
-                                          </TableCell>
-                                       ))}
-                                    </TableRow>
+                                    {t.tBodyCells.map((tc, index) => {
+                                       if (Array.isArray(tc)) {
+                                          return (
+                                             <TableRow hover role="checkbox" tabIndex={-1}>
+                                                {tc.map((tcValue, innerIndex) => (
+                                                   <TableCell key={`arrayTBCell_${index}_${innerIndex}`} colSpan={tcValue.colSpan} align={"center"}>
+                                                      {tcValue.value}
+                                                   </TableCell>
+                                                ))}
+                                             </TableRow>
+                                          );
+                                       } else if (typeof tc === "object")
+                                          return (
+                                             <TableCell key={`objectTBCell_${index}`} colSpan={tc.colSpan} align={"center"}>
+                                                {tc.value}
+                                             </TableCell>
+                                          );
+                                    })}
                                  </TableBody>
                               </>
                            ))}
@@ -274,21 +459,25 @@ export default function RequestReport({ obj }) {
                      </TableCell>
                   </TableRow>
                ))}
-
-               {/* <TableRow sx={{ height: 15 }}></TableRow> SEPARADOR */}
-
                <TableRow>
                   <TableCell colSpan={5}>
-                     <Table></Table>
+                     <Typography textAlign={"center"}>
+                        <span style={{ fontWeight: "bolder" }}>Nota:</span> Bajo protesta de decir la verdad, manifiesto que la información proporcionada en esta
+                        solicitud es verídica.
+                     </Typography>
+                  </TableCell>
+               </TableRow>
+               <TableRow sx={{ height: 20 }}></TableRow> {/* SEPARADOR */}
+               <TableRow>
+                  <TableCell colSpan={5}>
+                     <Typography textAlign={"center"} style={{ fontWeight: "bolder" }}>
+                        <p>___________________________________________________________</p>
+                        NOMBRE Y FIRMA DEL PADRE, MADRE O TUTOR.
+                     </Typography>
                   </TableCell>
                </TableRow>
             </TableBody>
-
-            {/* </Table> */}
          </Table>
-
-         {/* </Table>
-         </TableContainer> */}
       </Paper>
    );
 }

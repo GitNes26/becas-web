@@ -45,7 +45,11 @@ import { Box } from "@mui/system";
 import DialogComponent from "../../../components/DialogComponent";
 import RequestReport from "./RequestReport";
 import { getCommunityById } from "../../../components/Form/InputsCommunityComponent";
+import { useFamilyContext } from "../../../context/FamilyContext";
 // import { Preview, print } from "react-html2pdf";
+import html2pdf from "html2pdf.js";
+import MyPDFComponent from "../../../utils/createPDF";
+import { Page, Text, Document, PDFDownloadLink } from "@react-pdf/renderer";
 
 const RequestBecaDT = () => {
    const { auth } = useAuthContext();
@@ -53,10 +57,50 @@ const RequestBecaDT = () => {
    const { singularName, pluralName, requestBecas, setRequestBecas, getRequestBecas, showRequestBeca, deleteRequestBeca, setTextBtnSumbit, setFormTitle } =
       useRequestBecaContext();
    const globalFilterFields = ["folio", "code", "level", "school", "curp", "name", "paternal_last_name", "maternal_last_name", "average", "status", "created_at"];
+   const { getIndexByFolio } = useFamilyContext();
 
    const [openDialogPreview, setOpenDialogPreview] = useState(false);
    const [fullScreenDialog, setFullScreenDialog] = useState(false);
    const [objReport, setObjReport] = useState(null);
+
+   const [downloadOptions, setDownloadOptions] = useState({
+      margin: 0.5,
+      filename: "Solicitud de Beca.pdf",
+      image: {
+         type: "png",
+         quality: 0.5,
+         width: 300
+      },
+      enableLinks: true,
+      html2canvas: { scale: 2, useCORS: true },
+      jsPDF: {
+         unit: "px",
+         format: "letter",
+         orientation: "portrait",
+         scrollY: 0
+      }
+   });
+   let MyDocument;
+   const downloadPDF = (elementID) => {
+      const element = document.getElementById(elementID);
+      const clone = element.innerHTML;
+      const title = "Solicitud de Beca";
+      console.log(clone);
+      MyDocument = (
+         <Document>
+            <Page>{clone}</Page>
+         </Document>
+      );
+
+      // <MyPDFComponent elementID={"reportPaper"} />;
+
+      // setDownloadOptions({
+      //    ...downloadOptions,
+      //    filename: title
+      // });
+
+      // html2pdf().from(clone).set(downloadOptions).save();
+   };
 
    //#region BODY TEMPLATES
    const FolioBodyTemplate = (obj) => (
@@ -121,11 +165,13 @@ const RequestBecaDT = () => {
 
    const handleClickView = async (obj) => {
       setLoadingAction(true);
-      console.log(obj);
+      // console.log(obj);
       const community = await getCommunityById(obj.community_id);
       const school_community = await getCommunityById(obj.school_community_id);
+      const familyData = await getIndexByFolio(obj.folio);
       obj.community = community;
       obj.school_community = school_community;
+      obj.families = familyData.result.families;
       setObjReport(obj);
       setOpenDialogPreview(true);
       setLoadingAction(false);
@@ -186,21 +232,23 @@ const RequestBecaDT = () => {
    const ButtonsAction = ({ id, name, current_page, obj }) => {
       return (
          <ButtonGroup variant="outlined">
-            {auth.role_id <= ROLE_ADMIN && (
+            {auth.role_id <= ROLE_ADMIN && obj.status == "TERMINADA" && (
                <Tooltip title={`Ver Solicitud ${singularName}`} placement="top">
                   <Button color="dark" onClick={() => handleClickView(obj)}>
                      <IconEye />
                   </Button>
                </Tooltip>
             )}
-            <Tooltip title={`Solicitud ${name}`} placement="top">
-               <Button color="primary">
-                  <Link to={`/admin/solicitud-beca/pagina/${current_page}/folio/${id}`} target="_blank" style={{ textDecoration: "none" }}>
-                     {/* <IconEye /> */}
-                     Continuar
-                  </Link>
-               </Button>
-            </Tooltip>
+            {obj.end_date == null && (
+               <Tooltip title={`Solicitud ${name}`} placement="top">
+                  <Button color="primary">
+                     <Link to={`/admin/solicitud-beca/pagina/${current_page}/folio/${id}`} target="_blank" style={{ textDecoration: "none" }}>
+                        {/* <IconEye /> */}
+                        Continuar
+                     </Link>
+                  </Button>
+               </Tooltip>
+            )}
             <Tooltip title={`Editar ${singularName}`} placement="top">
                <Button color="info" onClick={() => handleClickEdit(id)}>
                   <IconEdit />
@@ -277,7 +325,7 @@ const RequestBecaDT = () => {
                   {"title"}
                </Typography>
                <Tooltip title={`Exportar Reporte a PDF`} placement="top">
-                  <IconButton color="inherit" onClick={() => Toast.Success("PDF")}>
+                  <IconButton color="inherit" onClick={() => downloadPDF("reportPaper")}>
                      <IconFileTypePdf color="red" />
                   </IconButton>
                </Tooltip>
