@@ -15,13 +15,12 @@ import { formatCurrency, formatDatetime, formatPhone, splitArroba } from "../../
 import Toast from "../../../utils/Toast";
 import { IconCheck } from "@tabler/icons";
 import CloseIcon from "@mui/icons-material/Close";
-import MyPDFComponent from "../../../utils/createPDF";
-// import { Document, Page } from "@react-pdf/renderer";
+import { Page, Text, Document, PDFDownloadLink, Canvas, Image } from "@react-pdf/renderer";
 
-export default function RequestReport({ obj }) {
+export default function RequestReportPDF({ obj }) {
    const checkCross = (value, size = 24) => {
       try {
-         return value ? <IconCheck height={size} /> : <CloseIcon fontSize={`${size + 5}px`} />;
+         return value ? <IconCheck height={size} /> : <CloseIcon fontSize={`${size}px`} />;
       } catch (error) {
          console.log(error);
          Toast.Error(error);
@@ -29,7 +28,7 @@ export default function RequestReport({ obj }) {
    };
    const titleStyle = { backgroundColor: "#364152", color: "whitesmoke", fontSize: 18, padding: 8 },
       subtitleStyle = { backgroundColor: "#525C6A", color: "whitesmoke", fontSize: 14, padding: 6, border: "1px solid #364152" },
-      valueStyle = { fontSize: 12, padding: 6, border: "1px solid #364152" };
+      valueStyle = { fontSize: 14, padding: 6, border: "1px solid #364152" };
 
    const tableRows = [
       //DATOS GENERALES
@@ -402,119 +401,119 @@ export default function RequestReport({ obj }) {
    // console.log(tableRows);
 
    return (
-      <Paper id="reportPaper" sx={{ width: "100%", overflow: "hidden" }}>
-         <Table>
-            {/* ENCABEZADO */}
-            <TableHead>
-               <TableRow sx={{ border: "none" }}>
-                  <TableCell align={"left"}>
-                     <img src={logo_gpd} style={{ width: 150 }} />
-                  </TableCell>
-                  <TableCell align={"center"} colSpan={3}>
-                     <img src={logo_gpd} style={{ width: 150 }} />
-                  </TableCell>
-                  <TableCell align={"right"}>
-                     <img src={logo_gpd} style={{ width: 150 }} />
-                  </TableCell>
-               </TableRow>
-               <TableRow sx={{ border: "none" }}>
-                  <TableCell colSpan={5} align={"center"}>
-                     <Typography variant="h1">DIRECCIÓN DE EDUCACIÓN</Typography>
-                     <Typography variant="h4">PROGRAMA DE BECAS MUNICIPALES</Typography>
-                     <Typography variant="p">ESTUDIO-SOCIOECONOMICO</Typography>
-                  </TableCell>
-               </TableRow>
-               <TableRow>
-                  <TableCell colSpan={5} align={"center"}>
-                     <Typography variant="p" align="justify" mb={2} sx={{ fontWeight: "normal", maxWidth: "70%" }}>
-                        El presente cuestionario tiene por objetivo conocer el perfil de los aspirantes a obtener una beca del <b>R. Ayuntamiento de Gómez Palacio</b>.
-                        La información proporcionada de aqui debe ser completamente verdadera, por ello, lee con atención cada pregunta y contesta adecuadamente.
-                     </Typography>
-                  </TableCell>
-               </TableRow>
-            </TableHead>
-            <TableBody>
-               {/* DATOS */}
-               {tableRows.map((tr, trIndex) => (
-                  <>
-                     <TableRow key={`tr1_${trIndex}`}>
-                        <TableCell key={`tc1_${trIndex}`} colSpan={tr.TableCellcolSpan}>
-                           <Table key={`table1_${trIndex}`}>
-                              {tr.table.map((t, tIndex) => (
-                                 <>
-                                    <TableHead key={`th1_${tIndex}`}>
-                                       {t.tHeadRows.map((thr, thrIndex) => {
-                                          if (thr[0].title === null) return;
-                                          return (
-                                             <TableRow key={`thr_tr_${thrIndex}`}>
-                                                {thr.map((tcTitle, innerIndex) => (
-                                                   <TableCell
-                                                      key={`arrayTHCell_${thrIndex}_${innerIndex}`}
-                                                      colSpan={tcTitle.colSpan}
-                                                      align={"center"}
-                                                      style={tcTitle.style}
-                                                   >
-                                                      {tcTitle.title}
-                                                   </TableCell>
-                                                ))}
-                                             </TableRow>
-                                          );
-                                       })}
-                                    </TableHead>
-                                    <TableBody key={`tb_${tIndex}`}>
-                                       {t.tBodyCells.map((tc, tbIndex) => {
-                                          if (Array.isArray(tc)) {
+      <Document>
+         <Page>
+            <Paper id="reportPaper" sx={{ width: "100%", overflow: "hidden" }}>
+               <Table stickyHeader aria-label="sticky table">
+                  {/* ENCABEZADO */}
+                  <TableHead>
+                     <TableRow sx={{ border: "none" }}>
+                        <TableCell align={"left"}>
+                           <Image src={logo_gpd} style={{ width: 150 }} />
+                        </TableCell>
+                        <TableCell align={"center"} colSpan={3}>
+                           <Image src={logo_gpd} style={{ width: 150 }} />
+                        </TableCell>
+                        <TableCell align={"right"}>
+                           <Image src={logo_gpd} style={{ width: 150 }} />
+                        </TableCell>
+                     </TableRow>
+                     <TableRow sx={{ border: "none" }}>
+                        <TableCell colSpan={5} align={"center"}>
+                           <Text variant="h1">DIRECCIÓN DE EDUCACIÓN</Text>
+                           <Text variant="h4">PROGRAMA DE BECAS MUNICIPALES</Text>
+                           <Text variant="p">ESTUDIO-SOCIOECONOMICO</Text>
+                        </TableCell>
+                     </TableRow>
+                     <TableRow>
+                        <TableCell colSpan={5} align={"center"}>
+                           <Text variant="p" align="justify" mb={2} sx={{ fontWeight: "normal", maxWidth: "70%" }}>
+                              El presente cuestionario tiene por objetivo conocer el perfil de los aspirantes a obtener una beca del{" "}
+                              <Text>R. Ayuntamiento de Gómez Palacio</Text>. La información proporcionada de aqui debe ser completamente verdadera, por ello, lee con
+                              atención cada pregunta y contesta adecuadamente.
+                           </Text>
+                        </TableCell>
+                     </TableRow>
+                  </TableHead>
+                  <TableBody>
+                     {/* DATOS */}
+                     {tableRows.map((tr, trIndex) => (
+                        <TableRow key={`PDFtr1_${trIndex}`}>
+                           <TableCell key={`PDFtc1_${trIndex}`} colSpan={tr.TableCellcolSpan}>
+                              <Table key={`PDFtable1_${trIndex}`}>
+                                 {tr.table.map((t, tIndex) => (
+                                    <>
+                                       <TableHead key={`PDFth1_${tIndex}`}>
+                                          {t.tHeadRows.map((thr, thrIndex) => {
+                                             if (thr[0].title === null) return;
                                              return (
-                                                <TableRow hover role="checkbox" tabIndex={-1} key={`tb_tr_${tbIndex}`}>
-                                                   {tc.map((tcValue, innerIndex) => (
-                                                      <TableCell
-                                                         key={`arrayTBCell_${tbIndex}_${innerIndex}`}
-                                                         colSpan={tcValue.colSpan}
+                                                <TableRow key={`PDFthr_tr_${thrIndex}`}>
+                                                   {thr.map((tcTitle, innerIndex) => (
+                                                      <Text
+                                                         key={`PDFarrayTHCell_${thrIndex}_${innerIndex}`}
+                                                         colSpan={tcTitle.colSpan}
                                                          align={"center"}
-                                                         style={tcValue.style}
+                                                         style={tcTitle.style}
                                                       >
-                                                         {tcValue.value}
-                                                      </TableCell>
+                                                         {tcTitle.title}
+                                                      </Text>
                                                    ))}
                                                 </TableRow>
                                              );
-                                          } else if (typeof tc === "object")
-                                             return (
-                                                <TableCell key={`objectTBCell_${tbIndex}`} colSpan={tc.colSpan} align={"center"} style={tc.style}>
-                                                   {tc.value}
-                                                </TableCell>
-                                             );
-                                       })}
-                                    </TableBody>
-                                 </>
-                              ))}
-                           </Table>
+                                          })}
+                                       </TableHead>
+                                       <TableBody key={`PDFtb_${tIndex}`}>
+                                          {t.tBodyCells.map((tc, tbIndex) => {
+                                             if (Array.isArray(tc)) {
+                                                return (
+                                                   <TableRow hover role="checkbox" tabIndex={-1} key={`PDFtb_tr_${tbIndex}`}>
+                                                      {tc.map((tcValue, innerIndex) => (
+                                                         <Text
+                                                            key={`PDFarrayTBCell_${tbIndex}_${innerIndex}`}
+                                                            colSpan={tcValue.colSpan}
+                                                            align={"center"}
+                                                            style={tcValue.style}
+                                                         >
+                                                            {tcValue.value}
+                                                         </Text>
+                                                      ))}
+                                                   </TableRow>
+                                                );
+                                             } else if (typeof tc === "object")
+                                                return (
+                                                   <Text key={`PDFobjectTBCell_${tbIndex}`} colSpan={tc.colSpan} align={"center"} style={tc.style}>
+                                                      {tc.value}
+                                                   </Text>
+                                                );
+                                          })}
+                                       </TableBody>
+                                    </>
+                                 ))}
+                              </Table>
+                           </TableCell>
+                        </TableRow>
+                     ))}
+                     <TableRow>
+                        <TableCell colSpan={5}>
+                           <Text textAlign={"center"}>
+                              <Text style={{ fontWeight: "bolder" }}>Nota:</Text> Bajo protesta de decir la verdad, manifiesto que la información proporcionada en esta
+                              solicitud es verídica.
+                           </Text>
                         </TableCell>
                      </TableRow>
-                     {trIndex % 3 == 0 && <div className="page-break"></div>}
-                  </>
-               ))}
-               <TableRow>
-                  <TableCell colSpan={5}>
-                     <Typography textAlign={"center"}>
-                        <span style={{ fontWeight: "bolder" }}>Nota:</span> Bajo protesta de decir la verdad, manifiesto que la información proporcionada en esta
-                        solicitud es verídica.
-                     </Typography>
-                  </TableCell>
-               </TableRow>
-               <TableRow sx={{ height: 20 }}></TableRow> {/* SEPARADOR */}
-               <TableRow>
-                  <TableCell colSpan={5}>
-                     <Typography textAlign={"center"} style={{ fontWeight: "bolder" }}>
-                        ___________________________________________________________{" "}
-                     </Typography>
-                     <Typography textAlign={"center"} style={{ fontWeight: "bolder" }}>
-                        NOMBRE Y FIRMA DEL PADRE, MADRE O TUTOR.
-                     </Typography>
-                  </TableCell>
-               </TableRow>
-            </TableBody>
-         </Table>
-      </Paper>
+                     <TableRow sx={{ height: 20 }}></TableRow> {/* SEPARADOR */}
+                     <TableRow>
+                        <TableCell colSpan={5}>
+                           <Text textAlign={"center"} style={{ fontWeight: "bolder" }}>
+                              <Text>___________________________________________________________</Text>
+                              NOMBRE Y FIRMA DEL PADRE, MADRE O TUTOR.
+                           </Text>
+                        </TableCell>
+                     </TableRow>
+                  </TableBody>
+               </Table>
+            </Paper>
+         </Page>
+      </Document>
    );
 }

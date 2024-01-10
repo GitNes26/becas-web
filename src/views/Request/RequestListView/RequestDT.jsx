@@ -48,8 +48,9 @@ import { getCommunityById } from "../../../components/Form/InputsCommunityCompon
 import { useFamilyContext } from "../../../context/FamilyContext";
 // import { Preview, print } from "react-html2pdf";
 import html2pdf from "html2pdf.js";
-import MyPDFComponent from "../../../utils/createPDF";
-import { Page, Text, Document, PDFDownloadLink } from "@react-pdf/renderer";
+// import MyPDFComponent from "../../../utils/createPDF";
+import { Page, Text, Document, PDFDownloadLink, PDFViewer } from "@react-pdf/renderer";
+import RequestReportPDF from "./RequestReportPDF";
 
 const RequestBecaDT = () => {
    const { auth } = useAuthContext();
@@ -68,13 +69,13 @@ const RequestBecaDT = () => {
       filename: "Solicitud de Beca.pdf",
       image: {
          type: "png",
-         quality: 0.5,
+         quality: 1,
          width: 300
       },
       enableLinks: true,
-      html2canvas: { scale: 2, useCORS: true },
+      html2canvas: { scale: 3, useCORS: true },
       jsPDF: {
-         unit: "px",
+         unit: "cm",
          format: "letter",
          orientation: "portrait",
          scrollY: 0
@@ -86,20 +87,20 @@ const RequestBecaDT = () => {
       const clone = element.innerHTML;
       const title = "Solicitud de Beca";
       console.log(clone);
-      MyDocument = (
-         <Document>
-            <Page>{clone}</Page>
-         </Document>
-      );
+      // MyDocument = (
+      //    <Document>
+      //       <Page>{clone}</Page>
+      //    </Document>
+      // );
 
       // <MyPDFComponent elementID={"reportPaper"} />;
 
-      // setDownloadOptions({
-      //    ...downloadOptions,
-      //    filename: title
-      // });
+      setDownloadOptions({
+         ...downloadOptions,
+         filename: title
+      });
 
-      // html2pdf().from(clone).set(downloadOptions).save();
+      html2pdf().from(clone).set(downloadOptions).save();
    };
 
    //#region BODY TEMPLATES
@@ -294,9 +295,24 @@ const RequestBecaDT = () => {
    const printContent = (idContent) => {
       var content = document.getElementById(idContent).innerHTML;
       var printWindow = window.open("", "_blank");
-      printWindow.document.write("<html><head><title>Imprimir contenido</title></head><body>");
+      printWindow.document.write(`<html><head><title>Imprimir contenido</title> <script>import "@fontsource/roboto/300.css";
+      import "@fontsource/roboto/400.css";
+      import "@fontsource/roboto/500.css";
+      import "@fontsource/roboto/700.css";
+      
+      import "./index.css";
+      import { CircularProgress, CssBaseline, ThemeProvider, Typography } from "@mui/material";
+      import "@material-ui/core/styles";
+      import themes from "./themes";
+      const customization = useSelector((state) => state.customization);
+      const { loading, loadingAction } = useGlobalContext();
+      <ThemeProvider theme={themes(customization)}>
+         <CssBaseline />
+      </script></head><body>`);
       printWindow.document.write(content);
-      printWindow.document.write("</body></html>");
+      printWindow.document.write(`</body><script>
+      </ThemeProvider>
+      </script></html>`);
       printWindow.document.close();
       printWindow.print();
    };
@@ -359,6 +375,12 @@ const RequestBecaDT = () => {
                   }}
                >
                   <RequestReport obj={objReport} />
+                  {/* <PDFViewer>
+                     <RequestReportPDF obj={objReport} />
+                  </PDFViewer> */}
+                  {/* <PDFDownloadLink document={MyDocument} fileName="documento.pdf">
+                     {({ blob, url, loading, error }) => (loading ? "Cargando documento..." : "Descargar PDF")}
+                  </PDFDownloadLink> */}
                </Box>
             </DialogContent>
             <DialogActions>

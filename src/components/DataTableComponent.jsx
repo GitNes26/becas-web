@@ -26,6 +26,62 @@ import IconDelete from "./icons/IconDelete";
 import { Toolbar } from "primereact/toolbar";
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
 
+/* COMO IMPROTAR
+*    columns={columns}
+         data={data}
+         globalFilterFields={globalFilterFields}
+         headerFilters={false}
+         handleClickAdd={handleClickAdd}
+         refreshTable={getUsers}
+         btnAdd={true}
+         showGridlines={false}
+         btnsExport={true}
+         rowEdit={false}
+         // handleClickDeleteContinue={handleClickDeleteContinue}
+         // ELIMINAR MULTIPLES REGISTROS
+         btnDeleteMultiple={false}
+         // handleClickDeleteMultipleContinue={handleClickDeleteMultipleContinue}
+         // PARA HACER FORMULARIO EN LA TABLA
+         // AGREGAR
+         // createData={createUser}
+         // newRow={newRow}
+         // EDITAR
+         // setData={setUsers}
+         // updateData={updateUser}
+      />
+*/
+
+/* const newRow = {
+      key: 0,
+      beca_id: becaId,
+      relationship: "",
+      age: "",
+      occupation: "",
+      monthly_income: ""
+   }; */
+/* FUNCIONES DE COMPLEMENTO
+*  FUNCION PARA ELIMINAR MULTIPLES REGISTROS
+   const handleClickDeleteContinue = async (selectedData) => {
+      try {
+         let ids = selectedData.map((d) => d.id);
+         if (ids.length < 1) console.log("no hay registros");
+         let msg = `¿Estas seguro de eliminar `;
+         if (selectedData.length === 1) msg += `al familiar registrado como tu ${selectedData[0].relationship}?`;
+         else if (selectedData.length > 1) msg += `a los familiares registrados como tu ${selectedData.map((d) => d.relationship)}?`;
+         mySwal.fire(QuestionAlertConfig(msg)).then(async (result) => {
+            if (result.isConfirmed) {
+               setLoadingAction(true);
+               const axiosResponse = await deleteFamily(ids);
+               setLoadingAction(false);
+               Toast.Customizable(axiosResponse.alert_text, axiosResponse.alert_icon);
+            }
+         });
+      } catch (error) {
+         console.log(error);
+         Toast.Error(error);
+      }
+   };
+*/
 export default function DataTableComponent({
    idName = "table",
    columns,
@@ -38,12 +94,13 @@ export default function DataTableComponent({
    createData,
    onRowEditCompleteContinue = null,
    updateData,
-   handleClickDeleteContinue,
    refreshTable,
    btnAdd = true,
    newRow = null,
    btnsExport = true,
-   showGridlines = false
+   showGridlines = false,
+   btnDeleteMultiple = false,
+   handleClickDeleteMultipleContinue
 }) {
    const { setLoadingAction, setOpenDialog } = useGlobalContext();
    const [selectedData, setSelectedData] = useState(null);
@@ -113,7 +170,7 @@ export default function DataTableComponent({
    const onRowEditComplete = async (e) => {
       try {
          // console.log(e);
-         console.log(data);
+         // console.log(data);
          let _data = [...data];
          let { newData, index } = e;
 
@@ -247,14 +304,31 @@ export default function DataTableComponent({
       );
    };
 
-   const handleClickDelete = async () => {
+   const handleClickDeleteMultiple = async () => {
       // console.log(selectedData);
-      await handleClickDeleteContinue(selectedData);
+      await handleClickDeleteMultipleContinue(selectedData);
       setSelectedData([]);
    };
 
    const header = (
       <Box sx={{ display: "flex", gap: 2, justifyContent: "space-between", alignItems: "center" }}>
+         {btnDeleteMultiple && (
+            <Tooltip title="Eliminar Seleccionados" placement="top">
+               <span>
+                  <IconButton
+                     type="button"
+                     variant="text"
+                     color="error"
+                     onClick={handleClickDeleteMultiple}
+                     disabled={!selectedData || !selectedData.length}
+                     sx={{ borderRadius: "12px", mr: 1 }}
+                  >
+                     <i className="pi pi-trash"></i>
+                  </IconButton>
+               </span>
+            </Tooltip>
+         )}
+
          {btnsExport && (
             <>
                <Tooltip title="Exportar a Excel" placement="top">
@@ -269,23 +343,6 @@ export default function DataTableComponent({
                   </IconButton>
                </Tooltip>
             </>
-         )}
-
-         {rowEdit && (
-            <Tooltip title="Eliminar Seleccionados" placement="top">
-               <span>
-                  <IconButton
-                     type="button"
-                     variant="text"
-                     color="error"
-                     onClick={handleClickDelete}
-                     disabled={!selectedData || !selectedData.length}
-                     sx={{ borderRadius: "12px", mr: 1 }}
-                  >
-                     <i className="pi pi-trash"></i>
-                  </IconButton>
-               </span>
-            </Tooltip>
          )}
 
          <Tooltip title="Refrescar Tabla" placement="top">
@@ -356,7 +413,7 @@ export default function DataTableComponent({
                onRowEditInit={handleOnRowEditIinit}
                onRowEditCancel={handleOnRowEditCancel}
             >
-               <Column selectionMode="multiple" exportable={false}></Column>
+               {btnDeleteMultiple && <Column selectionMode="multiple" exportable={false}></Column>}
                {columns.map((col, index) => (
                   <Column
                      key={index}
