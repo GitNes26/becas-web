@@ -15,13 +15,15 @@ import { formatCurrency, formatDatetime, formatPhone, splitArroba } from "../../
 import Toast from "../../../utils/Toast";
 import { IconCheck } from "@tabler/icons";
 import CloseIcon from "@mui/icons-material/Close";
+import CheckIcon from "@mui/icons-material/Check";
 import MyPDFComponent from "../../../utils/createPDF";
 // import { Document, Page } from "@react-pdf/renderer";
 
 export default function RequestReport({ obj }) {
    const checkCross = (value, size = 24) => {
       try {
-         return value ? <IconCheck height={size} /> : <CloseIcon fontSize={`${size + 5}px`} />;
+         const fontSize = size + 10;
+         return value ? <CheckIcon height={size} /> : <CloseIcon fontSize={`${fontSize}px !important`} />;
       } catch (error) {
          console.log(error);
          Toast.Error(error);
@@ -491,7 +493,8 @@ export default function RequestReport({ obj }) {
                            </Table>
                         </TableCell>
                      </TableRow>
-                     {trIndex % 3 == 0 && <div className="page-break"></div>}
+                     <div style={{ pageBreaBbefore: "always" }}></div>
+                     {/* {trIndex % 3 == 0 && <div className="page-break"></div>} */}
                   </>
                ))}
                <TableRow>

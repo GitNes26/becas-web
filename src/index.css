@@ -220,7 +220,7 @@ th.text-center .p-column-header-content {
 }
 
 .page-break {
-   page-break-after: always;
+   page-break-before: always;
 }
 
 @media (max-width: 1500px) {

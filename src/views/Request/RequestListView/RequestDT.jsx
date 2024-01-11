@@ -51,6 +51,11 @@ import html2pdf from "html2pdf.js";
 // import MyPDFComponent from "../../../utils/createPDF";
 import { Page, Text, Document, PDFDownloadLink, PDFViewer } from "@react-pdf/renderer";
 import RequestReportPDF from "./RequestReportPDF";
+// import PuppeteerHTMLPDF from "puppeteer-html-pdf";
+// import htmlPdfClient from "html-pdf-client";
+// import puppeteer from "puppeteer";
+// import htmlToPdf from "puppeteer-html-pdf";
+// import PuppeteerHTMLPDF from "puppeteer-html-pdf";
 
 const RequestBecaDT = () => {
    const { auth } = useAuthContext();
@@ -82,25 +87,195 @@ const RequestBecaDT = () => {
       }
    });
    let MyDocument;
-   const downloadPDF = (elementID) => {
-      const element = document.getElementById(elementID);
-      const clone = element.innerHTML;
-      const title = "Solicitud de Beca";
-      console.log(clone);
-      // MyDocument = (
-      //    <Document>
-      //       <Page>{clone}</Page>
-      //    </Document>
-      // );
 
-      // <MyPDFComponent elementID={"reportPaper"} />;
+   const downloadPDF = async (elementID) => {
+      const element = document.getElementById(elementID);
+      const htmlContent = element.innerHTML;
+      const title = "Solicitud de Beca";
+
+      // const htmlPDF = new PuppeteerHTMLPDF();
+      // const options = {
+      //    format: "A4",
+      //    path: `${__dirname}/sample.pdf` // you can pass path to save the file
+      // };
+      // htmlPDF.setOptions(options);
+
+      // const content = "<style> h1 {color:red;} </style> <h1>Welcome to puppeteer-html-pdf</h1>";
+
+      // try {
+      //    await htmlPDF.create(content);
+      // } catch (error) {
+      //    console.log("PuppeteerHTMLPDF error", error);
+      // }
+      // -------------------------------------------------------
+      // const browser = await puppeteer.launch();
+      // const page = await browser.newPage();
+
+      // await page.setContent(htmlContent);
+
+      // // Configuración opcional, como el formato de la página, el margen, etc.
+      // const pdfOptions = {
+      //    format: "A4",
+      //    margin: {
+      //       top: "20px",
+      //       bottom: "20px",
+      //       left: "20px",
+      //       right: "20px"
+      //    }
+      // };
+
+      // // Generar PDF
+      // const pdfBuffer = await PuppeteerHTMLPDF().from(page).set(pdfOptions).outputPdf();
+
+      // // Puedes guardar el PDF o realizar otras acciones con el buffer
+      // // Por ejemplo, puedes abrir una nueva ventana con el PDF:
+      // const pdfBlob = new Blob([pdfBuffer], { type: "application/pdf" });
+      // const pdfUrl = URL.createObjectURL(pdfBlob);
+      // window.open(pdfUrl);
+
+      // await browser.close();
+      // ------------------------------------------
 
       setDownloadOptions({
          ...downloadOptions,
          filename: title
       });
 
-      html2pdf().from(clone).set(downloadOptions).save();
+      html2pdf().from(htmlContent).set(downloadOptions).save();
+      // -------------------------------------------------
+
+      // const worker = htmlPdfClient.from(element).save();
+      // const pdfOptions = {
+      //    margin: 10,
+      //    filename: "documento.pdf",
+      //    image: { type: "jpeg", quality: 1 },
+      //    html2canvas: { scale: 3 },
+      //    jsPDF: { unit: "mm", format: "a4", orientation: "portrait" }
+      // };
+      // var options = {
+      //    orientation: "landscape",
+      //    border: {
+      //       top: "5mm", // default is 0, units: mm, cm, in, px
+      //       right: "0mm",
+      //       bottom: "10mm",
+      //       left: "0mm"
+      //    },
+      //    width: "297mm",
+      //    height: "210mm",
+      //    footer: {
+      //       height: "5mm",
+      //       contents: {
+      //          1: "PÁGINA 1",
+      //          2: "PÁGINA 2",
+      //          3: "PÁGINA 3",
+      //          4: "PÁGINA 4",
+      //          5: "PÁGINA 5",
+      //          6: "PÁGINA 6",
+      //          7: "PÁGINA 7",
+      //          8: "PÁGINA 8",
+      //          9: "PÁGINA 9",
+      //          10: "PÁGINA 10",
+      //          11: "PÁGINA 11",
+      //          12: "PÁGINA 12",
+      //          13: "PÁGINA 13",
+      //          14: "PÁGINA 14",
+      //          15: "PÁGINA 15",
+      //          16: "PÁGINA 16",
+      //          17: "PÁGINA 17",
+      //          18: "PÁGINA 18",
+      //          19: "PÁGINA 19",
+      //          20: "PÁGINA 20",
+      //          21: "PÁGINA 21",
+      //          22: "PÁGINA 22",
+      //          23: "PÁGINA 23",
+      //          24: "PÁGINA 24",
+      //          25: "PÁGINA 25",
+      //          26: "PÁGINA 26",
+      //          27: "PÁGINA 27",
+      //          28: "PÁGINA 28",
+      //          29: "PÁGINA 29",
+      //          30: "PÁGINA 30",
+      //          31: "PÁGINA 31",
+      //          32: "PÁGINA 32",
+      //          33: "PÁGINA 33",
+      //          34: "PÁGINA 34",
+      //          35: "PÁGINA 35",
+      //          36: "PÁGINA 36",
+      //          37: "PÁGINA 37",
+      //          38: "PÁGINA 38",
+      //          39: "PÁGINA 39",
+      //          40: "PÁGINA 40",
+      //          41: "PÁGINA 41",
+      //          42: "PÁGINA 42",
+      //          43: "PÁGINA 43",
+      //          44: "PÁGINA 44",
+      //          45: "PÁGINA 45",
+      //          46: "PÁGINA 46",
+      //          47: "PÁGINA 47",
+      //          48: "PÁGINA 48",
+      //          49: "PÁGINA 49",
+      //          50: "PÁGINA 50",
+      //          51: "PÁGINA 51",
+      //          52: "PÁGINA 52",
+      //          53: "PÁGINA 53",
+      //          54: "PÁGINA 54",
+      //          55: "PÁGINA 55",
+      //          56: "PÁGINA 56",
+      //          57: "PÁGINA 57",
+      //          58: "PÁGINA 58",
+      //          59: "PÁGINA 59",
+      //          60: "PÁGINA 60",
+      //          61: "PÁGINA 61",
+      //          62: "PÁGINA 62",
+      //          63: "PÁGINA 63",
+      //          64: "PÁGINA 64",
+      //          65: "PÁGINA 65",
+      //          66: "PÁGINA 66",
+      //          67: "PÁGINA 67",
+      //          68: "PÁGINA 68",
+      //          69: "PÁGINA 69",
+      //          70: "PÁGINA 70",
+      //          71: "PÁGINA 71",
+      //          72: "PÁGINA 72",
+      //          73: "PÁGINA 73",
+      //          74: "PÁGINA 74",
+      //          75: "PÁGINA 75",
+      //          76: "PÁGINA 76",
+      //          77: "PÁGINA 77",
+      //          78: "PÁGINA 78",
+      //          79: "PÁGINA 79",
+      //          80: "PÁGINA 80",
+      //          81: "PÁGINA 81",
+      //          82: "PÁGINA 82",
+      //          83: "PÁGINA 83",
+      //          84: "PÁGINA 84",
+      //          85: "PÁGINA 85",
+      //          86: "PÁGINA 86",
+      //          87: "PÁGINA 87",
+      //          88: "PÁGINA 88",
+      //          89: "PÁGINA 89",
+      //          90: "PÁGINA 90",
+      //          91: "PÁGINA 91",
+      //          92: "PÁGINA 92",
+      //          93: "PÁGINA 93",
+      //          94: "PÁGINA 94",
+      //          95: "PÁGINA 95",
+      //          96: "PÁGINA 96",
+      //          97: "PÁGINA 97",
+      //          98: "PÁGINA 98",
+      //          99: "PÁGINA 99",
+      //          100: "PÁGINA 100"
+      //       }
+      //    }
+      // };
+      // -------------------------------------------------
+      // await htmlPdf.create(pdf, options).toFile(path.join(__dirname,'..','..','public','pdfs',names),async(err,result)=>{
+
+      // const pdf = await htmlPdfClient().create(element).set()
+      // .from(element).set(pdfOptions).outputPdf().save();
+
+      // `pdf` now contains the generated PDF data. You can save it, display it, etc.
+      // console.log(pdf);
    };
 
    //#region BODY TEMPLATES
@@ -296,19 +471,19 @@ const RequestBecaDT = () => {
       var content = document.getElementById(idContent).innerHTML;
       var printWindow = window.open("", "_blank");
       printWindow.document.write(`<html><head><title>Imprimir contenido</title> <script>import "@fontsource/roboto/300.css";
-      import "@fontsource/roboto/400.css";
-      import "@fontsource/roboto/500.css";
-      import "@fontsource/roboto/700.css";
-      
-      import "./index.css";
-      import { CircularProgress, CssBaseline, ThemeProvider, Typography } from "@mui/material";
-      import "@material-ui/core/styles";
-      import themes from "./themes";
-      const customization = useSelector((state) => state.customization);
-      const { loading, loadingAction } = useGlobalContext();
-      <ThemeProvider theme={themes(customization)}>
-         <CssBaseline />
-      </script></head><body>`);
+      // import "@fontsource/roboto/400.css";
+      // import "@fontsource/roboto/500.css";
+      // import "@fontsource/roboto/700.css";
+
+      // import "./index.css";
+      // import { CircularProgress, CssBaseline, ThemeProvider, Typography } from "@mui/material";
+      // import "@material-ui/core/styles";
+      // import themes from "./themes";
+      // const customization = useSelector((state) => state.customization);
+      // const { loading, loadingAction } = useGlobalContext();
+      // <ThemeProvider theme={themes(customization)}>
+      //    <CssBaseline />
+      // </script></head><body>`);
       printWindow.document.write(content);
       printWindow.document.write(`</body><script>
       </ThemeProvider>
@@ -374,7 +549,8 @@ const RequestBecaDT = () => {
                      width: "95%"
                   }}
                >
-                  <RequestReport obj={objReport} />
+                  <RequestReportPDF obj={objReport} />
+                  {/* <RequestReport obj={objReport} /> */}
                   {/* <PDFViewer>
                      <RequestReportPDF obj={objReport} />
                   </PDFViewer> */}
