@@ -18,7 +18,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import CheckIcon from "@mui/icons-material/Check";
 import MyPDFComponent from "../../../utils/createPDF";
 // import { Document, Page } from "@react-pdf/renderer";
-import {} from "html-pdf-client";
+// import {} from "html-pdf-client";
 
 export default function RequestReportPDF({ obj }) {
    const checkCross = (value, size = 24) => {
@@ -36,6 +36,7 @@ export default function RequestReportPDF({ obj }) {
    const tableRows = [
       //DATOS GENERALES
       {
+         style: null,
          TableCellcolSpan: 5,
          table: [
             {
@@ -82,6 +83,7 @@ export default function RequestReportPDF({ obj }) {
       },
       //DATOS DEL ALUMNO
       {
+         style: { pageBreakAfter: "always" },
          TableCellcolSpan: 5,
          table: [
             {
@@ -153,6 +155,7 @@ export default function RequestReportPDF({ obj }) {
       },
       //DATOS DE LA ESCUELA
       {
+         style: null,
          TableCellcolSpan: 5,
          table: [
             {
@@ -216,6 +219,7 @@ export default function RequestReportPDF({ obj }) {
       },
       //DATOS FAMILIARES
       {
+         style: null,
          TableCellcolSpan: 5,
          table: [
             {
@@ -254,6 +258,7 @@ export default function RequestReportPDF({ obj }) {
       },
       //DATOS ECONOMICOS
       {
+         style: { pageBreakAfter: "always" },
          TableCellcolSpan: 6,
          table: [
             {
@@ -288,6 +293,7 @@ export default function RequestReportPDF({ obj }) {
       },
       //DATOS DE LA VIVIENDA
       {
+         style: null,
          TableCellcolSpan: 5,
          table: [
             {
@@ -309,6 +315,7 @@ export default function RequestReportPDF({ obj }) {
       },
       //EQUIPAMIENTO DOMÉSTICO
       {
+         style: null,
          TableCellcolSpan: 5,
          table: [
             {
@@ -372,6 +379,7 @@ export default function RequestReportPDF({ obj }) {
       },
       //PROGRAMAS DE BECAS
       {
+         style: null,
          TableCellcolSpan: 5,
          table: [
             {
@@ -442,55 +450,51 @@ export default function RequestReportPDF({ obj }) {
             <tbody>
                {/* DATOS */}
                {tableRows.map((tr, trIndex) => (
-                  <>
-                     <tr key={`tr1_${trIndex}`}>
-                        <td key={`tc1_${trIndex}`} colSpan={tr.TableCellcolSpan}>
-                           <table key={`table1_${trIndex}`} style={{ borderSpacing: "0", width: "100%", marginBottom: "30px" }}>
-                              {tr.table.map((t, tIndex) => (
-                                 <>
-                                    <thead key={`th1_${tIndex}`}>
-                                       {t.tHeadRows.map((thr, thrIndex) => {
-                                          if (thr[0].title === null) return null;
+                  <tr key={`tr1_${trIndex}`} style={tr.style}>
+                     <td key={`tc1_${trIndex}`} colSpan={tr.TableCellcolSpan}>
+                        <table key={`table1_${trIndex}`} style={{ borderSpacing: "0", width: "100%", marginBottom: "35px" }}>
+                           {tr.table.map((t, tIndex) => (
+                              <>
+                                 <thead key={`th1_${tIndex}`}>
+                                    {t.tHeadRows.map((thr, thrIndex) => {
+                                       if (thr[0].title === null) return null;
+                                       return (
+                                          <tr key={`thr_tr_${thrIndex}`}>
+                                             {thr.map((tcTitle, innerIndex) => (
+                                                <th key={`arrayTHCell_${thrIndex}_${innerIndex}`} colSpan={tcTitle.colSpan} align="center" style={tcTitle.style}>
+                                                   {tcTitle.title}
+                                                </th>
+                                             ))}
+                                          </tr>
+                                       );
+                                    })}
+                                 </thead>
+                                 <tbody key={`tb_${tIndex}`}>
+                                    {t.tBodyCells.map((tc, tbIndex) => {
+                                       if (Array.isArray(tc)) {
                                           return (
-                                             <tr key={`thr_tr_${thrIndex}`}>
-                                                {thr.map((tcTitle, innerIndex) => (
-                                                   <th key={`arrayTHCell_${thrIndex}_${innerIndex}`} colSpan={tcTitle.colSpan} align="center" style={tcTitle.style}>
-                                                      {tcTitle.title}
-                                                   </th>
+                                             <tr hover role="checkbox" tabIndex={-1} key={`tb_tr_${tbIndex}`}>
+                                                {tc.map((tcValue, innerIndex) => (
+                                                   <td key={`arrayTBCell_${tbIndex}_${innerIndex}`} colSpan={tcValue.colSpan} align="center" style={tcValue.style}>
+                                                      {tcValue.value}
+                                                   </td>
                                                 ))}
                                              </tr>
                                           );
-                                       })}
-                                    </thead>
-                                    <tbody key={`tb_${tIndex}`}>
-                                       {t.tBodyCells.map((tc, tbIndex) => {
-                                          if (Array.isArray(tc)) {
-                                             return (
-                                                <tr hover role="checkbox" tabIndex={-1} key={`tb_tr_${tbIndex}`}>
-                                                   {tc.map((tcValue, innerIndex) => (
-                                                      <td key={`arrayTBCell_${tbIndex}_${innerIndex}`} colSpan={tcValue.colSpan} align="center" style={tcValue.style}>
-                                                         {tcValue.value}
-                                                      </td>
-                                                   ))}
-                                                </tr>
-                                             );
-                                          } else if (typeof tc === "object") {
-                                             return (
-                                                <td key={`objectTBCell_${tbIndex}`} colSpan={tc.colSpan} align="center" style={tc.style}>
-                                                   {tc.value}
-                                                </td>
-                                             );
-                                          }
-                                       })}
-                                    </tbody>
-                                 </>
-                              ))}
-                           </table>
-                        </td>
-                     </tr>
-                     {/* <div style={{ pageBreakBefore: "always" }}></div> */}
-                     {trIndex % 3 == 0 && <div style={{ pageBreakAfter: "always" }}></div>}
-                  </>
+                                       } else if (typeof tc === "object") {
+                                          return (
+                                             <td key={`objectTBCell_${tbIndex}`} colSpan={tc.colSpan} align="center" style={tc.style}>
+                                                {tc.value}
+                                             </td>
+                                          );
+                                       }
+                                    })}
+                                 </tbody>
+                              </>
+                           ))}
+                        </table>
+                     </td>
+                  </tr>
                ))}
                <tr>
                   <td colSpan={5}>
@@ -500,7 +504,7 @@ export default function RequestReportPDF({ obj }) {
                      </p>
                   </td>
                </tr>
-               <tr style={{ height: "20px" }}></tr> {/* SEPARADOR */}
+               <tr style={{ height: "50px" }}></tr> {/* SEPARADOR */}
                <tr>
                   <td colSpan={5}>
                      <p style={{ textAlign: "center", fontWeight: "bolder" }}>___________________________________________________________</p>

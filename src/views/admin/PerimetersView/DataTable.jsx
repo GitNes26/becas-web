@@ -127,11 +127,11 @@ const PerimeterDT = () => {
                   <IconEdit />
                </Button>
             </Tooltip>
-            <Tooltip title={`Eliminar ${singularName}`} placement="top">
+            {/* <Tooltip title={`Eliminar ${singularName}`} placement="top">
                <Button color="error" onClick={() => handleClickDelete(id, name)}>
                   <IconDelete />
                </Button>
-            </Tooltip>
+            </Tooltip> */}
             {/* {auth.role_id == ROLE_SUPER_ADMIN && (
                <Tooltip title={active ? "Desactivar" : "Reactivar"} placement="right">
                   <Button color="dark" onClick={() => handleClickDisEnable(id, name, active)} sx={{}}>
@@ -147,9 +147,10 @@ const PerimeterDT = () => {
    const formatData = async () => {
       try {
          // console.log("cargar listado", perimeters);
-         await perimeters.map((obj) => {
+         await perimeters.map((obj, index) => {
             // console.log(obj);
             let register = obj;
+            register.key = index + 1;
             register.actions = <ButtonsAction id={obj.id} name={obj.perimeter} active={obj.active} />;
             data.push(register);
          });

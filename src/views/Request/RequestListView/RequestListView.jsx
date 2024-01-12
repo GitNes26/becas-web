@@ -97,7 +97,6 @@ const RequestListView = () => {
             {"LISTADO DE SOLICITUDES".toUpperCase()}
          </Typography>
          <RequestBecaDT />
-         {/* <TableComponent columns={columns} data={data} singularName={singularName} /> */}
       </Box>
    );
 };
