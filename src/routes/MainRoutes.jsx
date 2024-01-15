@@ -21,6 +21,8 @@ import TutorContextProvider from "../context/TutorContext";
 import { loaderIndexUsersView } from "../views/admin/UsersView/Index";
 import FamilyContextProvider from "../context/FamilyContext";
 import RequestListView from "../views/Request/RequestListView/RequestListView";
+import CommunitiesView from "../views/admin/CommunitiesView/Index";
+import CommunityContextProvider from "../context/CommunityContext";
 
 // dashboard routing
 const DashboardDefault = Loadable(lazy(() => import("../views/dashboard/Default")));
@@ -98,6 +100,14 @@ const MainRoutes = {
                )
             },
             {
+               path: "discapacidades",
+               element: (
+                  <DisabilityContextProvider>
+                     <DisabilitiesView />
+                  </DisabilityContextProvider>
+               )
+            },
+            {
                path: "perimetros",
                element: (
                   <PerimeterContextProvider>
@@ -106,11 +116,13 @@ const MainRoutes = {
                )
             },
             {
-               path: "discapacidades",
+               path: "comunidades",
                element: (
-                  <DisabilityContextProvider>
-                     <DisabilitiesView />
-                  </DisabilityContextProvider>
+                  <CommunityContextProvider>
+                     <PerimeterContextProvider>
+                        <CommunitiesView />
+                     </PerimeterContextProvider>
+                  </CommunityContextProvider>
                )
             }
          ]
@@ -122,11 +134,11 @@ const MainRoutes = {
                index: true,
                // path: "/",
                element: (
-                  <RequestBecaContextProvider>
-                     <FamilyContextProvider>
+                  <FamilyContextProvider>
+                     <RequestBecaContextProvider>
                         <RequestListView />
-                     </FamilyContextProvider>
-                  </RequestBecaContextProvider>
+                     </RequestBecaContextProvider>
+                  </FamilyContextProvider>
                )
             }
          ]

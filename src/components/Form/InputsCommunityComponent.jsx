@@ -9,6 +9,19 @@ import { useGlobalContext } from "../../context/GlobalContext";
 import Select2Component from "./Select2Component";
 
 /** ESTRUCTURTAS PARA IMPORTAR EL COMPONENTE
+ * hay que importar ciertos sets de GlobalContext
+  const {
+      setDisabledState,
+      setDisabledCity,
+      setDisabledColony,
+      setShowLoading,
+      setDataStates,
+      setDataCities,
+      setDataColonies,
+      setDataColoniesComplete
+   } = useGlobalContext();
+
+
  * esta es la estructura del componente a insertar
    <InputsCommunityComponent
       formData={formData}
@@ -140,7 +153,19 @@ export const getCommunity = async (
  * @param {*} param0
  * @returns community_id: int
  */
-const InputsCommunityComponent = ({ formData, setFormData, values, setFieldValue, setValues, handleChange, handleBlur, errors, touched, columnsByTextField = 6 }) => {
+const InputsCommunityComponent = ({
+   formData,
+   setFormData,
+   values,
+   setFieldValue,
+   setValues,
+   handleChange,
+   handleBlur,
+   errors,
+   touched,
+   columnsByTextField = 6,
+   registerCommunity = false
+}) => {
    const {
       setCursorLoading,
       disabledState,
@@ -347,96 +372,85 @@ const InputsCommunityComponent = ({ formData, setFormData, values, setFieldValue
                /> */}
             </Grid>
             {/* Colonia */}
-            <Grid xs={12} md={columnsByTextField} sx={{ mb: 2 }}>
-               <Select2Component
-                  idName={"colony"}
-                  label={"Colonia *"}
-                  valueLabel={values.colony}
-                  formDataLabel={"colony"}
-                  placeholder={"Selecciona una opción..."}
-                  options={dataColonies}
-                  fullWidth={true}
-                  handleChangeValueSuccess={handleChangeColony}
-                  handleBlur={handleBlur}
-                  error={errors.colony}
-                  touched={touched.colony}
-                  disabled={disabledColony}
-               />
-               {/* <Select2Component
-                  idName={"colony"}
-                  label={"Colonia"}
-                  valueLabel={values.colony}
-                  values={values}
-                  formData={formData}
-                  setFormData={setFormData}
-                  formDataLabel={"colony"}
-                  // placeholder={"Selecciona una opción..."}
-                  options={dataColonies}
-                  fullWidth={true}
-                  handleChange={handleChange}
-                  handleChangeValueSuccess={handleChangeColony}
-                  setValues={setValues}
-                  handleBlur={handleBlur}
-                  error={errors.colony}
-                  touched={touched.colony}
-                  disabled={disabledColony}
-               /> */}
-            </Grid>
+            {!registerCommunity && (
+               <Grid xs={12} md={columnsByTextField} sx={{ mb: 2 }}>
+                  <Select2Component
+                     idName={"colony"}
+                     label={"Colonia *"}
+                     valueLabel={values.colony}
+                     formDataLabel={"colony"}
+                     placeholder={"Selecciona una opción..."}
+                     options={dataColonies}
+                     fullWidth={true}
+                     handleChangeValueSuccess={handleChangeColony}
+                     handleBlur={handleBlur}
+                     error={errors.colony}
+                     touched={touched.colony}
+                     disabled={disabledColony}
+                  />
+               </Grid>
+            )}
          </Grid>
          {/* Calle */}
-         <Grid xs={12} md={8} sx={{ mb: 2 }}>
-            <TextField
-               id="street"
-               name="street"
-               label="Calle *"
-               type="text"
-               value={values.street}
-               placeholder="Calle de las Garzas"
-               onChange={handleChange}
-               onBlur={handleBlur}
-               fullWidth
-               // disabled={values.id == 0 ? false : true}
-               onInput={(e) => handleInputFormik(e, setFieldValue, "street", true)}
-               error={errors.street && touched.street}
-               helperText={errors.street && touched.street && errors.street}
-            />
-         </Grid>
+         {!registerCommunity && (
+            <Grid xs={12} md={8} sx={{ mb: 2 }}>
+               <TextField
+                  id="street"
+                  name="street"
+                  label="Calle *"
+                  type="text"
+                  value={values.street}
+                  placeholder="Calle de las Garzas"
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  fullWidth
+                  // disabled={values.id == 0 ? false : true}
+                  onInput={(e) => handleInputFormik(e, setFieldValue, "street", true)}
+                  error={errors.street && touched.street}
+                  helperText={errors.street && touched.street && errors.street}
+               />
+            </Grid>
+         )}
          {/* No. Ext. */}
-         <Grid xs={12} md={2} sx={{ mb: 2 }}>
-            <TextField
-               id="num_ext"
-               name="num_ext"
-               label="No. Ext. *"
-               type="text"
-               value={values.num_ext}
-               placeholder="S/N"
-               onChange={handleChange}
-               onBlur={handleBlur}
-               fullWidth
-               onInput={(e) => handleInputFormik(e, setFieldValue, "num_ext", true)}
-               // disabled={values.id == 0 ? false : true}
-               error={errors.num_ext && touched.num_ext}
-               helperText={errors.num_ext && touched.num_ext && errors.num_ext}
-            />
-         </Grid>
+         {!registerCommunity && (
+            <Grid xs={12} md={2} sx={{ mb: 2 }}>
+               <TextField
+                  id="num_ext"
+                  name="num_ext"
+                  label="No. Ext. *"
+                  type="text"
+                  value={values.num_ext}
+                  placeholder="S/N"
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  fullWidth
+                  onInput={(e) => handleInputFormik(e, setFieldValue, "num_ext", true)}
+                  // disabled={values.id == 0 ? false : true}
+                  error={errors.num_ext && touched.num_ext}
+                  helperText={errors.num_ext && touched.num_ext && errors.num_ext}
+               />
+            </Grid>
+         )}
          {/* No. Int. */}
-         <Grid xs={12} md={2} sx={{ mb: 2 }}>
-            <TextField
-               id="num_int"
-               name="num_int"
-               label="No. Int."
-               type="text"
-               value={values.num_int}
-               placeholder="S/N"
-               onChange={handleChange}
-               onBlur={handleBlur}
-               fullWidth
-               onInput={(e) => handleInputFormik(e, setFieldValue, "num_int", true)}
-               // disabled={values.id == 0 ? false : true}
-               error={errors.num_int && touched.num_int}
-               helperText={errors.num_int && touched.num_int && errors.num_int}
-            />
-         </Grid>
+         {!registerCommunity && (
+            <Grid xs={12} md={2} sx={{ mb: 2 }}>
+               <TextField
+                  id="num_int"
+                  name="num_int"
+                  label="No. Int."
+                  type="text"
+                  value={values.num_int}
+                  placeholder="S/N"
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  fullWidth
+                  onInput={(e) => handleInputFormik(e, setFieldValue, "num_int", true)}
+                  // disabled={values.id == 0 ? false : true}
+                  error={errors.num_int && touched.num_int}
+                  helperText={errors.num_int && touched.num_int && errors.num_int}
+               />
+            </Grid>
+         )}
       </>
    );
 };

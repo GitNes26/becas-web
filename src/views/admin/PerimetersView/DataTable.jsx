@@ -54,7 +54,7 @@ const PerimeterDT = () => {
 
    // #endregion BodysTemplate
 
-   const columns = [{ field: "perimeter", header: "Nivel", sortable: true, functionEdit: null, body: PerimeterBodyTemplate, filterField: null }];
+   const columns = [{ field: "perimeter", header: "Perímetro", sortable: true, functionEdit: null, body: PerimeterBodyTemplate, filterField: null }];
    auth.role_id === ROLE_SUPER_ADMIN &&
       columns.push(
          { field: "active", header: "Activo", sortable: true, functionEdit: null, body: ActiveBodyTemplate, filterField: null },
