@@ -32,7 +32,7 @@ import { useRequestBecaContext } from "../../../context/RequestBecaContext";
 
 export let monthlyIncome = 0;
 
-const FamilyDT = ({ becaId }) => {
+const FamilyDT = ({ becaId, setFieldValue, values }) => {
    let { folio, pagina = 0 } = useParams();
 
    const { auth } = useAuthContext();
@@ -51,6 +51,7 @@ const FamilyDT = ({ becaId }) => {
       resetFamily,
       setTextBtnSumbit,
       setFormTitle
+      // setMonthlyIncome
    } = useFamilyContext();
    const globalFilterFields = ["relationship", "age", "occupation", "monthly_income", "active", "created_at"];
 
@@ -162,7 +163,7 @@ const FamilyDT = ({ becaId }) => {
       }
    };
 
-   const handleClickDeleteContinue = async (selectedData) => {
+   const handleClickDeleteMultipleContinue = async (selectedData) => {
       try {
          let ids = selectedData.map((d) => d.id);
          if (ids.length < 1) console.log("no hay registros");
@@ -172,7 +173,7 @@ const FamilyDT = ({ becaId }) => {
          mySwal.fire(QuestionAlertConfig(msg)).then(async (result) => {
             if (result.isConfirmed) {
                setLoadingAction(true);
-               const axiosResponse = await deleteFamily(ids);
+               const axiosResponse = await deleteFamily(ids, folio);
                setLoadingAction(false);
                Toast.Customizable(axiosResponse.alert_text, axiosResponse.alert_icon);
             }
@@ -203,7 +204,7 @@ const FamilyDT = ({ becaId }) => {
    const data = [];
    const formatData = async () => {
       try {
-         console.log("cargar listado", families);
+         // console.log("cargar listado", families);
          families.sort((a, b) => a.id - b.id);
          monthlyIncome = 0;
 
@@ -216,10 +217,12 @@ const FamilyDT = ({ becaId }) => {
 
             monthlyIncome += Number(obj.monthly_income);
          });
-         // setMonthlyIncome(monthlyIncome);
-         // monthlyIncomeChange();
-         // console.log("cargar listado", families);
-
+         // console.log("monthlyIncome", monthlyIncome);
+         // console.log("values", values.monthly_income);
+         if (values.monthly_income != monthlyIncome + Number(values.extra_income)) {
+            monthlyIncome += Number(values.extra_income);
+            setFieldValue("monthly_income", monthlyIncome);
+         }
          // if (data.length > 0) setGlobalFilterFields(Object.keys(families[0]));
          // console.log("la data del formatData", globalFilterFields);
          setLoading(false);
@@ -259,7 +262,8 @@ const FamilyDT = ({ becaId }) => {
          updateData={updateFamily}
          btnAdd={true}
          newRow={newRow}
-         handleClickDeleteContinue={handleClickDeleteContinue}
+         btnDeleteMultiple={true}
+         handleClickDeleteMultipleContinue={handleClickDeleteMultipleContinue}
          refreshTable={(e) => getIndexByFolio(folio)}
          btnsExport={false}
       />

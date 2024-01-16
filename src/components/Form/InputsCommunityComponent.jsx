@@ -164,7 +164,8 @@ const InputsCommunityComponent = ({
    errors,
    touched,
    columnsByTextField = 6,
-   registerCommunity = false
+   registerCommunity = false,
+   disabled = false
 }) => {
    const {
       setCursorLoading,
@@ -404,7 +405,7 @@ const InputsCommunityComponent = ({
                   onChange={handleChange}
                   onBlur={handleBlur}
                   fullWidth
-                  // disabled={values.id == 0 ? false : true}
+                  disabled={disabled}
                   onInput={(e) => handleInputFormik(e, setFieldValue, "street", true)}
                   error={errors.street && touched.street}
                   helperText={errors.street && touched.street && errors.street}
@@ -425,7 +426,7 @@ const InputsCommunityComponent = ({
                   onBlur={handleBlur}
                   fullWidth
                   onInput={(e) => handleInputFormik(e, setFieldValue, "num_ext", true)}
-                  // disabled={values.id == 0 ? false : true}
+                  disabled={disabled}
                   error={errors.num_ext && touched.num_ext}
                   helperText={errors.num_ext && touched.num_ext && errors.num_ext}
                />
@@ -445,7 +446,7 @@ const InputsCommunityComponent = ({
                   onBlur={handleBlur}
                   fullWidth
                   onInput={(e) => handleInputFormik(e, setFieldValue, "num_int", true)}
-                  // disabled={values.id == 0 ? false : true}
+                  disabled={disabled}
                   error={errors.num_int && touched.num_int}
                   helperText={errors.num_int && touched.num_int && errors.num_int}
                />

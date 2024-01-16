@@ -75,7 +75,7 @@ const RequestBecaView = () => {
       setDataColoniesComplete
    } = useGlobalContext();
 
-   // const { getIndexByFolio, families } = useFamilyContext();
+   const { families, monthlyIncome } = useFamilyContext();
 
    const { disabilities, getDisabilitiesSelectIndex } = useDisabilityContext();
    const { relationships, getRelationshipsSelectIndex } = useRelationshipContext();
@@ -169,13 +169,13 @@ const RequestBecaView = () => {
             : activeStep + 1;
 
       setActiveStep(newActiveStep);
-      if (pagina >= 4) location.hash = `/admin/solicitud-beca/pagina/${activeStep + 2}/folio/${folio}`;
+      if (pagina >= 4 || folio > 0) location.hash = `/admin/solicitud-beca/pagina/${activeStep + 2}/folio/${folio}`;
       else location.hash = `/admin/solicitud-beca/pagina/${activeStep + 2}`;
    };
 
    const handleBack = () => {
       setActiveStep((prevActiveStep) => prevActiveStep - 1);
-      if (pagina >= 4) location.hash = `/admin/solicitud-beca/pagina/${activeStep}/folio/${folio}`;
+      if (pagina >= 4 || folio > 0) location.hash = `/admin/solicitud-beca/pagina/${activeStep}/folio/${folio}`;
       else location.hash = `/admin/solicitud-beca/pagina/${activeStep}`;
    };
 
@@ -194,6 +194,7 @@ const RequestBecaView = () => {
       setActiveStep(0);
       setCompleted({});
       resetFormData();
+      location.hash = `/admin/solicitud-beca`;
       // setTimeout(() => {
       //    inputRefFullNameTutor.current.focus();
       // }, 1000);
@@ -218,7 +219,7 @@ const RequestBecaView = () => {
                      // loadingPosition="start"
                      variant="contained"
                   >
-                     {console.log(completedSteps())}
+                     {/* {console.log(completedSteps())} */}
                      {completedSteps() === 3 ? "REGISTRAR SOLICITUD" : "ADELANTE"}
                   </Button>
 
@@ -357,7 +358,7 @@ const RequestBecaView = () => {
          }
          // console.log("values", values);
          await setFormData({ ...formData, ...values });
-         console.log("formData-1", formData);
+         // console.log("formData-1", formData);
          // await setValues(formData);
          // console.log("formData", formData);
          // console.log("values", values);
@@ -381,9 +382,9 @@ const RequestBecaView = () => {
       try {
          values.num_int = values.num_int === "" ? "S/N" : values.num_int;
 
-         console.log("values", values);
+         // console.log("values", values);
          await setFormData({ ...formData, ...values });
-         console.log("formData-2", formData);
+         // console.log("formData-2", formData);
          // await setValues(values);
          // console.log("formData", formData);
          // console.log("values", values);
@@ -403,34 +404,35 @@ const RequestBecaView = () => {
 
    const onSubmit3 = async (values, { setSubmitting, setErrors, resetForm, setValues, setFieldValue }) => {
       try {
-         // console.log("formData en submit3", formData);
-         console.log("values", values);
-         await setFormData({ ...formData, ...values });
-         // console.log("formData", formData);
-         // await setValues(formData);
-         console.log("formData-3", formData);
-         console.log("values", values);
-         // console.log(formData);
-         setLoadingAction(true);
-         let axiosResponse;
-         if (values.id == 0) axiosResponse = await createRequestBeca(values);
-         else axiosResponse = await updateRequestBeca(values);
-         setSubmitting(false);
-         setLoadingAction(false);
+         if (!folio) {
+            // console.log("formData en submit3", formData);
+            // console.log("values", values);
+            await setFormData({ ...formData, ...values });
+            // await setValues(formData);
+            // console.log("formData-3", formData);
+            // console.log("values", values);
+            // console.log(formData);
+            setLoadingAction(true);
+            let axiosResponse;
+            if (values.id == 0) axiosResponse = await createRequestBeca(values);
+            else axiosResponse = await updateRequestBeca(values);
+            setSubmitting(false);
+            setLoadingAction(false);
 
-         if (axiosResponse.status_code != 200) return Toast.Error(axiosResponse.alert_text);
-         sAlert.Customizable(axiosResponse.alert_text, axiosResponse.alert_icon);
-         console.log("axiosResponse", axiosResponse);
-         folio = axiosResponse.result.folio;
-         sAlert.Success(
-            `Tu solicitud ha sido creada, termina de llenar el formulario para que se considere tu solicitud. Tu folio es: 
+            if (axiosResponse.status_code != 200) return Toast.Error(axiosResponse.alert_text);
+            sAlert.Customizable(axiosResponse.alert_text, axiosResponse.alert_icon);
+            // console.log("axiosResponse", axiosResponse);
+            folio = axiosResponse.result.folio;
+            sAlert.Success(
+               `Tu solicitud ha sido creada, termina de llenar el formulario para que se considere tu solicitud. Tu folio es: 
             <h1>${folio}</h1> 
             <i>Puedes ver tus solicitudes guardadas y su estatus en la sección de "Mis Solicitudes" en tú menú lateral</i>`,
-            null
-         );
-         setStepFailed(-1);
-         setFieldValue("id", axiosResponse.result.id);
-         setFieldValue("folio", axiosResponse.result.folio);
+               null
+            );
+            setStepFailed(-1);
+            setFieldValue("id", axiosResponse.result.id);
+            setFieldValue("folio", axiosResponse.result.folio);
+         }
          // resetForm();
          // resetFormData();
          handleComplete();
@@ -515,7 +517,7 @@ const RequestBecaView = () => {
          values.b4_score += Number(values.b4_roof_material.split("@")[0]) || 0;
          values.b4_score += Number(values.b4_floor_material.split("@")[0]) || 0;
          await setFormData({ ...formData, ...values });
-         console.log("formData", values);
+         // console.log("formData", values);
          // return console.log("values", values);
          // await setFormData(values);
          // await setValues(formData);
@@ -569,7 +571,7 @@ const RequestBecaView = () => {
          values.b5_score += Number(values.b5_phone_line ? 1 : 0) || 0;
          values.b5_score += Number(values.b5_internet ? 1 : 0) || 0;
          await setFormData({ ...formData, ...values });
-         console.log("formData", values);
+         // console.log("formData", values);
          // return console.log("values", values);
          // await setFormData(values);
          // await setValues(formData);
@@ -606,7 +608,7 @@ const RequestBecaView = () => {
          values.b6_other = values.b6_other ? true : false || false;
          values.end_date = formatDatetimeToSQL(new Date());
          await setFormData({ ...formData, ...values });
-         console.log("formData", values);
+         // console.log("formData", values);
          // return console.log("values", values);
          // await setFormData(values);
          // await setValues(formData);
@@ -769,7 +771,7 @@ const RequestBecaView = () => {
 
    const [houseIs, setHouseIs] = useState("Porpia");
    const handleHouseIs = (event, newValue) => {
-      console.log("el newValue", event.target.value);
+      // console.log("el newValue", event.target.value);
       setHouseIs(event.target.value);
    };
 
@@ -786,7 +788,7 @@ const RequestBecaView = () => {
       try {
          setCompleted({ 0: true, 1: true, 2: true });
          const ajaxResponse = await getRequestBecasByFolio(folio);
-         console.log("holaaaaa familia", ajaxResponse.result.requestBecas);
+         // console.log("holaaaaa familia", ajaxResponse.result.requestBecas);
          if (ajaxResponse.result.requestBecas.monthly_income)
             if (ajaxResponse.result.requestBecas.b3_finished)
                if (ajaxResponse.result.requestBecas.b4_finished)
@@ -806,7 +808,7 @@ const RequestBecaView = () => {
    };
 
    const handleChangeTotal = (e, values, setFieldValue) => {
-      console.log("value", e.target.name);
+      // console.log("value", e.target.name);
       const name = e.target.name;
       const value = Number(e.target.value) || 0;
       const b3_food = name == "b3_food" ? value : values.b3_food,
@@ -820,8 +822,8 @@ const RequestBecaView = () => {
 
    useEffect(() => {
       if (formData.id < 1) {
-         console.log("folio de params?", folio);
-         console.log("pagina de params?", pagina);
+         // console.log("folio de params?", folio);
+         // console.log("pagina de params?", pagina);
          if (folio) {
             const btnModify = document.getElementById("btnModify");
             if (btnModify != null) btnModify.click();
@@ -831,11 +833,15 @@ const RequestBecaView = () => {
          getRelationshipsSelectIndex();
          setLoading(false);
 
+         if (families) {
+            // console.log("hay familias");
+         }
+
          // window.location.hash = ;
          // inputRefFullNameTutor.current.focus();
          // console.log("useEffect - formData", formData);
       }
-   }, []);
+   }, [folio]);
    // }, [formData, pagina, activeStep]);
 
    return (
@@ -923,7 +929,7 @@ const RequestBecaView = () => {
                                                 FormHelperTextProps={{ itemScope: <IconInfoCircle /> }}
                                                 type="text"
                                                 value={values.tutor_curp}
-                                                placeholder="Ingresa tu CURP"
+                                                placeholder="Escribe tu CURP"
                                                 onChange={(e) => {
                                                    handleChange(e);
                                                    handleChangeTutorCURP(e, values, setValues, setFieldValue);
@@ -952,7 +958,7 @@ const RequestBecaView = () => {
                                                 handleBlur={handleBlur}
                                                 error={errors.tutor_relationship_id}
                                                 touched={touched.tutor_relationship_id}
-                                                disabled={false}
+                                                disabled={values.id == 0 ? false : true}
                                              />
                                           </Grid>
                                           {/* Nombre Tutor */}
@@ -968,7 +974,7 @@ const RequestBecaView = () => {
                                                 onBlur={handleBlur}
                                                 fullWidth
                                                 onInput={(e) => handleInputFormik(e, setFieldValue, "tutor_name", true)}
-                                                // disabled={values.id == 0 ? false : true}
+                                                disabled={values.id == 0 ? false : true}
                                                 inputRef={inputRefFullNameTutor}
                                                 error={errors.tutor_name && touched.tutor_name}
                                                 helperText={errors.tutor_name && touched.tutor_name && showErrorInput(1, errors.tutor_name)}
@@ -987,7 +993,7 @@ const RequestBecaView = () => {
                                                 onBlur={handleBlur}
                                                 fullWidth
                                                 onInput={(e) => handleInputFormik(e, setFieldValue, "tutor_paternal_last_name", true)}
-                                                // disabled={values.id == 0 ? false : true}
+                                                disabled={values.id == 0 ? false : true}
                                                 inputRef={inputRefFullNameTutor}
                                                 error={errors.tutor_paternal_last_name && touched.tutor_paternal_last_name}
                                                 helperText={
@@ -1010,7 +1016,7 @@ const RequestBecaView = () => {
                                                 onBlur={handleBlur}
                                                 fullWidth
                                                 onInput={(e) => handleInputFormik(e, setFieldValue, "tutor_maternal_last_name", true)}
-                                                // disabled={values.id == 0 ? false : true}
+                                                disabled={values.id == 0 ? false : true}
                                                 inputRef={inputRefFullNameTutor}
                                                 error={errors.tutor_maternal_last_name && touched.tutor_maternal_last_name}
                                                 helperText={
@@ -1033,7 +1039,7 @@ const RequestBecaView = () => {
                                                 onChange={handleChange}
                                                 onBlur={handleBlur}
                                                 fullWidth
-                                                // disabled={values.id == 0 ? false : true}
+                                                disabled={values.id == 0 ? false : true}
                                                 error={errors.tutor_phone && touched.tutor_phone}
                                                 helperText={errors.tutor_phone && touched.tutor_phone && showErrorInput(1, errors.tutor_phone)}
                                              />
@@ -1076,7 +1082,7 @@ const RequestBecaView = () => {
                                              </>
                                           )}
                                        </Grid>
-                                       <ButtonsBeforeOrNext isSubmitting={isSubmitting} setValues={setValues} />
+                                       {!(folio > 0) && <ButtonsBeforeOrNext isSubmitting={isSubmitting} setValues={setValues} />}
                                     </Box>
                                  )}
                               </Formik>
@@ -1100,7 +1106,7 @@ const RequestBecaView = () => {
                                                 FormHelperTextProps={{ itemScope: <IconInfoCircle /> }}
                                                 type="text"
                                                 value={values.curp}
-                                                placeholder="Ingresa tu CURP"
+                                                placeholder="Escribe tu CURP"
                                                 onChange={(e) => {
                                                    handleChange(e);
                                                    handleChangeCURP(e, values, setValues, setFieldValue);
@@ -1123,7 +1129,7 @@ const RequestBecaView = () => {
                                                 label="Nombre del Alumno *"
                                                 type="text"
                                                 value={values.name}
-                                                placeholder="Juan Manuel"
+                                                placeholder="Escribe tu nombre"
                                                 onChange={handleChange}
                                                 onBlur={handleBlur}
                                                 fullWidth
@@ -1141,7 +1147,7 @@ const RequestBecaView = () => {
                                                 label="Apellido Paterno *"
                                                 type="text"
                                                 value={values.paternal_last_name}
-                                                placeholder="Perez"
+                                                placeholder="Escribe tu apellido paterno"
                                                 onChange={handleChange}
                                                 onBlur={handleBlur}
                                                 fullWidth
@@ -1159,7 +1165,7 @@ const RequestBecaView = () => {
                                                 label="Apellido Materno *"
                                                 type="text"
                                                 value={values.maternal_last_name}
-                                                placeholder="López"
+                                                placeholder="Escribe tu apellido materno"
                                                 onChange={handleChange}
                                                 onBlur={handleBlur}
                                                 fullWidth
@@ -1180,11 +1186,12 @@ const RequestBecaView = () => {
                                                 error={errors.birthdate}
                                                 touched={touched.birthdate}
                                                 formData={formData}
+                                                disabled={values.id == 0 ? false : true}
                                              />
                                           </Grid>
                                           {/* Genero */}
                                           <Grid xs={12} md={4} sx={{ mb: 1 }}>
-                                             <FormControl fullWidth sx={{ alignItems: "center" }}>
+                                             <FormControl fullWidth sx={{ alignItems: "center" }} disabled={values.id == 0 ? false : true}>
                                                 <FormLabel id="gender-label">Género</FormLabel>
                                                 <RadioGroup
                                                    row
@@ -1219,7 +1226,7 @@ const RequestBecaView = () => {
                                                 handleBlur={handleBlur}
                                                 error={errors.disability_id}
                                                 touched={touched.disability_id}
-                                                disabled={false}
+                                                disabled={values.id == 0 ? false : true}
                                              />
                                           </Grid>
 
@@ -1239,21 +1246,22 @@ const RequestBecaView = () => {
                                              errors={errors}
                                              touched={touched}
                                              columnsByTextField={3}
+                                             disabled={values.id == 0 ? false : true}
                                           />
 
                                           {/* <LoadingButton
-                                    type="submit"
-                                    disabled={isSubmitting}
-                                    loading={isSubmitting}
-                                    // loadingPosition="start"
-                                    variant="contained"
-                                    fullWidth
-                                    size="large"
-                                 >
-                                    Registrar o Guardar
-                                 </LoadingButton> */}
+                                             type="submit"
+                                             disabled={isSubmitting}
+                                             loading={isSubmitting}
+                                             // loadingPosition="start"
+                                             variant="contained"
+                                             fullWidth
+                                             size="large"
+                                             >
+                                                Registrar o Guardar
+                                             </LoadingButton> */}
                                        </Grid>
-                                       <ButtonsBeforeOrNext isSubmitting={isSubmitting} setValues={setValues} />
+                                       {!(folio > 0) && <ButtonsBeforeOrNext isSubmitting={isSubmitting} setValues={setValues} />}
                                     </Box>
                                  )}
                               </Formik>
@@ -1285,7 +1293,7 @@ const RequestBecaView = () => {
                                                 handleBlur={handleBlur}
                                                 error={errors.school_id}
                                                 touched={touched.school_id}
-                                                disabled={false}
+                                                disabled={values.id == 0 ? false : true}
                                                 // inputref={inputRefSchoolId}
                                              />
                                           </Grid>
@@ -1346,7 +1354,7 @@ const RequestBecaView = () => {
                                              />
                                           </Grid>
                                        </Grid>
-                                       <ButtonsBeforeOrNext isSubmitting={isSubmitting} setValues={setValues} />
+                                       {!(folio > 0) && <ButtonsBeforeOrNext isSubmitting={isSubmitting} setValues={setValues} />}
                                     </Box>
                                  )}
                               </Formik>
@@ -1365,7 +1373,7 @@ const RequestBecaView = () => {
                                              <Typography variant="h2" mb={2}>
                                                 ¿Quienes viven actualmente con el alumno?
                                              </Typography>
-                                             <FamilyDT becaId={formData.id} monthlyIncomeChange={() => monthlyIncomeChange(values, setValues)} />
+                                             <FamilyDT becaId={folio} setFieldValue={setFieldValue} values={values} />
                                           </Grid>
 
                                           {/* Ingresos Extra */}
@@ -1399,7 +1407,7 @@ const RequestBecaView = () => {
                                                 onBlur={handleBlur}
                                                 fullWidth
                                                 inputProps={{ step: 0.01, min: 0, max: 100000 }}
-                                                // disabled={values.id == 0 ? false : true}
+                                                disabled={true}
                                                 error={errors.monthly_income && touched.monthly_income}
                                                 helperText={errors.monthly_income && touched.monthly_income && showErrorInput(4, errors.monthly_income)}
                                              />

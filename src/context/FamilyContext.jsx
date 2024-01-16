@@ -25,6 +25,7 @@ export default function FamilyContextProvider({ children }) {
    const [families, setFamilies] = useState([]);
    const [family, setFamily] = useState(null);
    const [formData, setFormData] = useState(formDataInitialState);
+   const [monthlyIncome, setMonthlyIncome] = useState(0);
 
    const resetFormData = () => {
       try {
@@ -136,7 +137,7 @@ export default function FamilyContextProvider({ children }) {
 
          // socket.send("getFamilies()");
 
-         getFamilies();
+         getIndexByFolio(family.beca_id);
       } catch (error) {
          res = ErrorRes;
          console.log(error);
@@ -151,7 +152,7 @@ export default function FamilyContextProvider({ children }) {
       try {
          const axiosData = await Axios.put(`/families/update/${family.id}`, family);
          res = axiosData.data.data;
-         getFamilies();
+         getIndexByFolio(family.beca_id);
          // return res;
       } catch (error) {
          res = ErrorRes;
@@ -162,13 +163,13 @@ export default function FamilyContextProvider({ children }) {
       return res;
    };
 
-   const deleteFamily = async (ids) => {
+   const deleteFamily = async (ids, beca_id) => {
       try {
          let res = CorrectRes;
          const axiosData = await Axios.post(`/families/destroy`, { ids });
          // console.log("deleteFamily() axiosData", axiosData.data);
-         getFamilies();
          res = axiosData.data.data;
+         getIndexByFolio(beca_id);
          // console.log("res", res);
          return res;
       } catch (error) {
@@ -206,7 +207,9 @@ export default function FamilyContextProvider({ children }) {
             singularName,
             pluralName,
             getIndexByBeca,
-            getIndexByFolio
+            getIndexByFolio,
+            monthlyIncome,
+            setMonthlyIncome
          }}
       >
          {children}
