@@ -676,7 +676,7 @@ const RequestBecaView = () => {
                // gender: Yup.string().trim().required("Género requerido"),
                zip: Yup.number("Solo números").required("Código Postal requerido"),
                community_id: Yup.number().min(1, "Ésta opción no es valida").required("Colonia requerida"),
-               colony: Yup.string().trim().required("Colonia requerida"),
+               colony: Yup.string().trim().notOneOf(["Selecciona una opción..."], "Ésta opción no es valida").required("Colonia requerida"),
                street: Yup.string().trim().required("Dirección requerida"),
                num_ext: Yup.string().trim().required("Número exterior requerido"),
                // num_int: Yup.string().trim().required("Clave de escuela requerida"),
@@ -686,7 +686,7 @@ const RequestBecaView = () => {
          case 3: // PAGINA DATOS DE LA ESCUELA
             validationSchema = Yup.object().shape({
                // id: 0,
-               school_id: Yup.number("Solo números").required("Escuela requerida"),
+               school_id: Yup.number("Solo números").min(1, "Ésta opción no es valida").required("Escuela requerida"),
                grade: Yup.number("Solo números").required("Grado estudiantil requerido"),
                average: Yup.number("Solo números").required("Promedio actual requerido")
                // comments: Yup.string().trim().required("Comentarios requeridos"),
@@ -1414,7 +1414,7 @@ const RequestBecaView = () => {
                                           </Grid>
                                        </Grid>
 
-                                       <ButtonsBeforeOrNext isSubmitting={isSubmitting} setValues={setValues} />
+                                       {folio > 0 && <ButtonsBeforeOrNext isSubmitting={isSubmitting} setValues={setValues} />}
                                     </Box>
                                  )}
                               </Formik>
@@ -1591,7 +1591,7 @@ const RequestBecaView = () => {
                                           </Grid>
                                        </Grid>
 
-                                       <ButtonsBeforeOrNext isSubmitting={isSubmitting} setValues={setValues} />
+                                       {folio > 0 && <ButtonsBeforeOrNext isSubmitting={isSubmitting} setValues={setValues} />}
                                     </Box>
                                  )}
                               </Formik>
@@ -1716,7 +1716,7 @@ const RequestBecaView = () => {
                                           </Grid>
                                        </Grid>
 
-                                       <ButtonsBeforeOrNext isSubmitting={isSubmitting} setValues={setValues} />
+                                       {folio > 0 && <ButtonsBeforeOrNext isSubmitting={isSubmitting} setValues={setValues} />}
                                     </Box>
                                  )}
                               </Formik>
@@ -2049,7 +2049,7 @@ const RequestBecaView = () => {
                                           </Grid>
                                        </Grid>
 
-                                       <ButtonsBeforeOrNext isSubmitting={isSubmitting} setValues={setValues} />
+                                       {folio > 0 && <ButtonsBeforeOrNext isSubmitting={isSubmitting} setValues={setValues} />}
                                     </Box>
                                  )}
                               </Formik>
@@ -2149,7 +2149,7 @@ const RequestBecaView = () => {
                                           </Grid>
                                        </Grid>
 
-                                       <ButtonsBeforeOrNext isSubmitting={isSubmitting} setValues={setValues} />
+                                       {folio > 0 && <ButtonsBeforeOrNext isSubmitting={isSubmitting} setValues={setValues} />}
                                     </Box>
                                  )}
                               </Formik>
